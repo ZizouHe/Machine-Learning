@@ -1,0 +1,94 @@
+---
+title: "Note 1"
+author: "Lai Zehua 2014012668"
+date: "2017??10??14??"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newtheorem*{definition}{Definition} 
+\newtheorem*{cher}{Chernoff Bound}
+\newtheorem*{hoe}{Hoeffding}
+\newtheorem*{azu}{Azuma}
+\newtheorem*{mcd}{McDiarmid}
+\newtheorem*{dra}{Draw with/without replacement}
+
+\begin{definition}
+X is called $\sigma^2$-subgaussian if
+$$
+\log E[e^{\lambda(X-EX)}]\leq\frac{1}{2}\lambda^2\sigma^2 = MGF(N(0,\delta^2))
+$$
+\end{definition}
+
+\begin{cher}
+If X is $\sigma^2$-subgaussian, then,
+$$
+Pr[X>EX+t]\leq e^{-\frac{t^2}{2\sigma^2}}
+$$
+\end{cher}
+
+\begin{proof}
+Same.
+\end{proof}
+
+\begin{hoe}
+If $a\leq X \leq b$ then X is $\frac{1}{4}(b-a)^2$-subgaussian.
+\end{hoe}
+
+\begin{proof}
+Let $\log E[e^{\lambda(X-EX)}] = \phi (\lambda)$, then
+\begin{align*}
+\phi'(\lambda)&=\frac{E[(X-EX)e^{\lambda(X-EX)}]}{E[e^{\lambda(X-EX)}]}\\
+\phi''(\lambda)&=\frac{E[(X-EX)^2 e^{\lambda(X-EX)}]}{E[e^{\lambda(X-EX)}]}-\frac{E[(X-EX)e^{\lambda(X-EX)}]}{E[e^{\lambda(X-EX)}]^2}\\
+&\leq \frac{E[(X-EX)^2 e^{\lambda(X-EX)}]}{E[e^{\lambda(X-EX)}]}\\
+&\leq \frac{1}{4}(a-b)^2
+\end{align*}
+\end{proof}
+
+\begin{azu}
+${X_t}$ be r.v. $E[X_t|\mathcal{F}_{t-1}]=X_{t-1}$(martingale), $\Delta_t = X_t - X_{t-1}$. If $a_t \leq \Delta_t \leq b_t$, then $X_t$ is $\frac{1}{4}\sum_{i=1}^t(b_t-a_t)^2$-subgaussian.
+\end{azu}
+
+\begin{proof}
+$EX_t = 0$
+\begin{align*}
+&Ee^{\lambda X_t}\\
+=&Ee^{\lambda (X_{t-1}+\Delta_t)}\\
+=&E[E[e^{\lambda (X_{t-1}+\Delta_t)}|\mathcal{F}_{t-1}]]\\
+=&E[e^{\lambda X_{t-1}}E[e^{\lambda \Delta_t}|\mathcal{F}_{t-1}]]\\
+\leq&E[e^{\lambda X_{t-1}}]e^{\frac{1}{8}\lambda^2(b_t-a_t)^2} 
+\end{align*}
+\end{proof}
+
+
+\begin{mcd}
+$X_1, X_2, ..., X_n$ independent r.v. $f(x_1,x_2,...,x_n)$
+$$
+D_i f = sup_{x_{-i}}sup_{x,y}|f(x_{-i},x)-f(x_{-i},y)|
+$$
+then $f(X_1, X_2, ..., X_n)$ is $\frac{1}{4}\sum_{i=1}^n D_if^2$-subgaussian.\footnote{Probability in High Dimension (Princeton).} 
+\end{mcd}
+
+\begin{proof}
+Let $Z_i = E[f(X_1,...,X_n)|X_1,...,X_i]$, then $f-E[f] = \sum_{i=1}^n Z_i-Z_{i-1}$, then
+$$
+E[Z_i|X_1,...,X_{i-1}]=E[f(X_1,...,X_n)|X_1,...,X_{i-1}] = Z_{i-1}
+$$
+$Z_i$ is martingale (Doob martingale).
+\end{proof}
+
+\begin{dra}
+$E[e^{\lambda (X_1+...+X_n)}] \leq E[e^{\lambda (X_1'+...+X_n')}]$.
+\end{dra}
+
+\begin{proof}
+Taylor expansion: $E[(X_1+...+X_n)^i] \leq E[(X_1'+...+X_n')^i]$
+\end{proof}
+

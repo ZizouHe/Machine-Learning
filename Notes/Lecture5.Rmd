@@ -1,0 +1,143 @@
+---
+title: "Note 1"
+author: "Lai Zehua 2014012668"
+date: "2017Äê10ÔÂ14ÈÕ"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+\newtheorem{pro}{Problem}
+\newtheorem*{vcd}{VC-Dimension}
+\newtheorem*{lin}{Linear Classifier}
+\newtheorem*{app}{Appendix: Game Theory \& Lagrange Duality}
+\newtheorem*{sad}{Saddle Point Theorem}
+\newtheorem*{kkt}{KKT-conditions}
+\newtheorem*{ter}{Term Project}
+
+\begin{vcd}
+If $\exists x_1,...,x_n, s.t. \mathcal{F}$ shatters $x_1,...,x_n$ and $\forall x_1,...,x_{n+1}$, $\mathcal{F}$ can not shatter $x_1,...,x_{n+1}$. n is the \textbf{VC-dimension} of $\mathcal{F}$\\
+\end{vcd}
+
+\begin{lin}$$
+max_{w,b,t} t
+$$
+$$
+s.t.y_i(w^Tx_i+b)\geq t
+$$
+$$
+\|w\|=1
+$$
+or
+
+$$
+min_{w,b} \frac{1}{2}\|w\|^2
+$$
+$$
+s.t. y_i(w^Tx_i+b)\geq 1
+$$
+\end{lin}
+
+\begin{app}
+In two player zero-sum game, We have minmax = maxmin in a Nash equilibrium.\footnote{A course in Game Theory, P25}
+$$
+\max_{y\in A_2}\min_{x\in A_1} u_1(x,y) = \min_{x\in A_1}\max_{y\in A_2} u_1(x,y)
+$$
+\end{app}
+
+\begin{pro}
+For a matrix M, $\min_i\max_jM_{ij}\geq \max_j\min_iM_{ij}$ which means that if two player choose pure strategy and to act sequentially, second one gets an advantage.
+\end{pro}
+
+If two players can choose mixed strategy, a Nash equilibrium exists, so the equation above holds.
+
+\begin{sad}
+$f(x,y)$ Fix $y$, $f(\cdot,y)$ is convex. Fix $x$, $f(x,\cdot)$ is concave, then
+$$
+\max_{y}\min_{x} f(x,y) = \min_{x}\max_{y} f(x,y)
+$$
+\end{sad}
+
+If $f(x), g_i(x)$ are convex and $h_i(x)$ is linear, the optimization problem
+\begin{align*}
+  &\begin{cases}
+    min f(x)\\
+    s.t. g_i(x)\leq 0 \\
+    h_i(x)=0
+  \end{cases}\\
+\iff &\begin{cases}
+    min_{x}max_{\mu,\lambda} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)\\
+    s.t.  \lambda_i\geq 0
+  \end{cases}\\
+\iff &\begin{cases}
+    max_{\mu,\lambda} min_{x} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)\\
+    s.t.  \lambda_i\geq 0
+  \end{cases}
+\end{align*}
+
+Let $L(x,\mu,\lambda) = f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)$, solve $\frac{\partial L}{\partial x}=0$ to get $x^*=\phi(\mu,\lambda)$.
+It suffices to solve $max_{\mu,\lambda} f(\phi(\mu,\lambda))+\sum\mu_ih_i(\phi(\mu,\lambda))+\sum\lambda_ig_i(\phi(\mu,\lambda))$.
+
+
+\begin{align*}
+\text{The linear classifier problem is} \begin{cases}
+min_{w,b} \frac{1}{2}\|w\|^2 \\
+s.t. y_i(w^Tx_i+b)\geq 1
+\end{cases}
+\end{align*}
+
+$$
+\iff \begin{cases}
+min_{w,b,\lambda_i}L(w,b)=\frac{1}{2}\|w\|^2-\sum\lambda_i[y_i(w^Tx_i+b)-1]\\
+\lambda_i\geq 0
+\end{cases}
+$$
+$L(w,b)=\frac{1}{2}\|w\|^2-\sum\lambda_i[y_i(w^Tx_i+b)-1]$, $w^*=\sum\lambda_iy_ix_i$, $\sum\lambda_iy_i=0$
+
+\begin{kkt}
+(1) Stationary:
+$\left.\nabla L(x,\lambda,\mu)\right|_{x^*,\lambda^*,\mu^*}=0$
+
+
+(2) Primal feasibility:
+$h_i(x^*)=0, g_i(x^*)\leq 0$
+
+
+(3) Dual Feasible
+$\lambda^*\geq 0$
+
+
+(4)Complementary slackness
+$\lambda_ig_i(x^*)=0$
+\\
+\end{kkt}
+
+\begin{pro}
+KKT is necessary condition.
+\\
+\end{pro}
+\begin{pro}
+If $f(x), g_i(x)$ are convex and $h_i(x)$ is linear, KKT is sufficient condition.
+\\
+\end{pro}
+
+By KKT condition, $\lambda^*_i[y_i(w^{*T}x_i+b^*)-1]=0$. $\lambda^*_i = 0$ for all $(x_i,y_i)$ that are not closest to the hyperspace. $\lambda^*_i \neq 0$ for all support vector. It is the Support Vector Machine (SVM).
+
+\begin{ter}
+Data space = [N], $\mathcal{F}\subseteq\{0,1\}^N$, VC dmension $VC(\mathcal{F})=d$ if $\exists i_1,...,i_d$, $\mathcal{F}$'s projection onto $i_1,...,i_d$ contains $\{0,1\}^d$ and $\forall i_1,...,i_{d+1}$'s projection onto $i_1,...,i_{d+1} \neq \{0,1\}^{d+1}$ 
+
+$f\in \mathcal{F}$, $\exists X_f\subseteq X$, $f|_{X_f}\neq f'|_{X_f}, \forall f'\in \mathcal{F}$
+
+Teaching dimension of f is $TD(f,\mathcal{F})=min|X_f|$, best case teaching dimension is $TD_{min}(\mathcal{F})=min_{f\in \mathcal{F}}TD(f,\mathcal{F})$.
+
+Let $\mathcal{F}_0=\mathcal{F}$ and assume $f_1, s.t. TD_{min}(\mathcal{F})=TD(f_1,\mathcal{F})$, $\mathcal{F}_1=\mathcal{F}_0\backslash\{f_1\}$ and so on.
+
+Define Recursive Teaching Dimension: $RTD(\mathcal{F}) = max_tTD_{min}(\mathcal{F}_t)$, then $RTD(\mathcal{F})=O(VC(\mathcal{F})^2)$
+\end{ter}
+
+*Reference*: Quadratic Upper Bound for Recursive Teaching Dimension of Finite VC Classes

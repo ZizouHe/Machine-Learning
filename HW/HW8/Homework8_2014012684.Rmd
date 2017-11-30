@@ -1,0 +1,65 @@
+---
+title: "Machine Learning Homework 8"
+author: "He Li, 2014012684"
+date: "2017/11/23"
+output: pdf_document
+---
+
+
+
+\newtheorem{pro}{Problem}
+
+\begin{pro}
+Suppose $\mathcal{A}$ has uniform stability $\beta$ with respect to loss $l$ and $l\leq M$, then with probability $1-\delta$,
+$$
+R(\mathcal{A}(S))\leq R_{\mathrm{emp}}(\mathcal{A}(S))+\beta+(n\beta+M)\sqrt{\frac{2 \log\frac{1}{\delta}}{n}}
+$$
+\end{pro}
+
+\begin{proof}
+Denote $f(S) = R(\mathcal{A}(S)) - R_{\mathrm{emp}}(\mathcal{A}(S))$. The theorem is equivalent to 
+$$
+\mathbb{P}[f(S)\geq\beta+\epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+\begin{align*}
+E_{S}[R_{\mathrm{emp}}(\mathcal{A}(S))] &= E_{S} \left[\frac{1}{n}\sum_{i=1}^n l(\mathcal{A}(S),z_i)\right] \\
+&= \frac{1}{n}\sum_{i=1}^n E_{S, z_i'} \left[ l(\mathcal{A}(S^i),z_i')\right]
+\end{align*}
+also, 
+$$
+E_S [R(\mathcal{A}(S))] = E_{S, z_i'} l(\mathcal{A}(S),z_i')
+$$
+By the definition of uniform stability, we know that
+$$
+| l(\mathcal{A}(S),z_i') - l(\mathcal{A}(S^i),z_i') | \leq \beta
+$$
+Therefore,
+$$
+E_S[f(S)] \leq \beta
+$$
+Also,
+\begin{align*}
+|f(S) - f(S^i)| 
+&= |R(\mathcal{A}(S)) - R_{\mathrm{emp}}(\mathcal{A}(S)) - R(\mathcal{A}(S^i)) + R_{\mathrm{emp}}(\mathcal{A}(S^i))| \\
+&\leq |R(\mathcal{A}(S)) - R(\mathcal{A}(S^i))| + \frac{1}{n}\sum_{i=1}^n |l(\mathcal{A}(S),z_i) - l(\mathcal{A}(S^i),z_i)| \\
+&\leq \beta + \frac{n-1}{n} \beta + \frac{2M}{n} \\
+&\leq 2(\beta + \frac{M}{n})
+\end{align*}
+Then, by Mcdiarmid's Lemma, 
+$$
+\mathbb{P}[f(S)\geq E_S[f(S)] + \epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+Therefore, by the fact that $E_S[f(S)] \leq \beta$
+$$
+\mathbb{P}[f(S)\geq\beta+\epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+\end{proof}
+
+
+
+
+
+
+
+
+

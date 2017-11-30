@@ -1,0 +1,62 @@
+---
+title: "Machine Learning Homework 2"
+author: "He Li, 2014012684"
+date: "2017/10/11"
+output: pdf_document
+---
+
+### 1. Denote $z_i = (x_i, y_i)$, $\phi_f(z_i) = I(y_i \neq f(x_i)$. Prove:
+\begin{align*}
+&\frac{1}{2}\mathbb{P}\left(\sup_{\phi \in \Phi} \left|\frac{1}{n} \sum_{i=1}^n \phi(z_i) - \mathbb{E}[\phi(z)]\right| \geq 2 \epsilon\right) \\
+\leq &\mathbb{P}\left(\sup_{\phi \in \Phi} \left|\frac{1}{n} \sum_{i=1}^n \phi(z_i) - \frac{1}{n} \sum_{i=n+1}^{2n} \phi(z_i)\right| \geq \epsilon\right) \\
+\leq &2\mathbb{P}\left(\sup_{\phi \in \Phi} \left|\frac{1}{n} \sum_{i=1}^n \phi(z_i) - \mathbb{E}[\phi(z)]\right| \geq \frac{\epsilon}{2}\right)
+\end{align*}
+
+*proof*
+
+We know that $\phi_f(z_1), ..., \phi_f(z_n), \phi_f(z_{n+1}), ..., \phi_f(z_{2n})$ are i.i.d Bernoulli *R.V.*. $\mathbb{E}(\phi_f(z)) = p$. Denote $\nu_1 = \frac{1}{n} \sum_{i = 1}^n \phi_f(z_i)$, $\nu_2 = \frac{1}{n} \sum_{i = n+1}^{2n} \phi_f(z_i)$. 
+
+Consider the right inequality, we have
+$$
+\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon \Longrightarrow \mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq \frac{\epsilon}{2} \; \mathrm{or} \; \mathop{\mathrm{sup}}\limits_{\phi \in \Phi} \;|\nu_2 - p| \geq \frac{\epsilon}{2}
+$$
+Therefore, 
+\begin{align*}
+\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon\} 
+&\subset \{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq \frac{\epsilon}{2}\} \cup \{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_2 - p| \geq \frac{\epsilon}{2}\} \\
+\therefore \;
+\mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon\right)
+&\leq \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq \frac{\epsilon}{2} \cup \mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu2 - p| \geq \frac{\epsilon}{2}\right) \\
+&\leq \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq \frac{\epsilon}{2}\right) + \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_2 - p| \geq \frac{\epsilon}{2}\right) \\
+&= 2\mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq \frac{\epsilon}{2}\right)
+\end{align*}
+
+Similarily, assume $f\in \Phi$ such that $\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p|=|\nu_1' - p'|$, then
+
+\begin{align*}
+&\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq 2\epsilon \; \mathrm{and} \; |\nu_2' - p'| \leq \epsilon \Longrightarrow \mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon \\
+\therefore \; 
+&\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq 2\epsilon\right\} 
+\cap \left\{|\nu_2' - p'| \leq \epsilon\right\} 
+\subset \left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon\right\} \\
+\therefore \; 
+&\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon\right\}\right)
+\geq
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+ \mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right)
+\end{align*}
+We have an upper bound on $\mathbb{P}\left(\left\{|\nu_2' - p'| \geq \epsilon\right\}\right)$. When $n \geq \frac{\ln2}{2\epsilon^2}$,
+$$
+\mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right) = 1 -  \mathbb{P}\left(\left\{|\nu_2' - p'| \geq \epsilon\right\}\right) \geq 1 - \exp\{-2n\epsilon^2\} \geq \frac{1}{2}
+$$
+$$
+\therefore \;
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - \nu_2| \geq \epsilon\right\}\right)
+\geq
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+\mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right)
+\geq \frac{1}{2}\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{\phi \in \Phi}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+$$
+
+
+\begin{flushright}$\Box$\end{flushright}

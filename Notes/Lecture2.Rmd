@@ -1,0 +1,90 @@
+---
+title: "Lecture 2 Concentration Inequality"
+author: "He Li Machine Learning Course"
+date: "2017/10/10"
+output: pdf_document
+---
+
+## 1. Concentration Inequality
+
+### Chernoff bound
+
+$x_1 ... x_n$ independent, $\in [0,1]$, $\mathbb{E}\{x_i\} = p$. Then,
+$$
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon) \leq \mathrm{exp}\{-nD_B(p+\epsilon \| p)\} \leq \mathrm{exp}\{-2n\epsilon^2\}
+$$
+
+### Hoeffding Inequility
+
+$x_1 ... x_n$ independent, $\in [a_i,b_i]$, $\mathbb{E}\{x_i\} = p$. Then,
+$$
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum (b_i - a_i)^2}\}
+$$
+
+? without independence, is concentration exists?
+
+## 2. Martingale
+
+### Definition
+
+*R.V.* $S_0 ... S_n ...$, $\forall i$, (fair game)
+$$
+\mathbb{E}[S_i | S_{i-1}, ... S_0] = S_{i-1}
+$$
+Denote $X_i = S_i - S_{i-1}$ martingale difference, then we have **Azuma's Inequality**:
+
+$x_1 ... x_n$ martingale difference, $|x_i| \leq C_i$, $S_0 = 0$,$\mathbb{E}\{x_i\} = p$. Then,
+$$
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum C_i^2}\}
+$$
+
+### Super Martingale
+
+*R.V.* $S_0 ... S_n ...$, $\forall i$, 
+$$
+\mathbb{E}[S_i | S_{i-1}, ... S_0] \leq S_{i-1}
+$$
+
+Then, $x_1 ... x_n$ super martingale difference, $|x_i| \leq C_i$, $S_0 = 0$,$\mathbb{E}\{x_i\} = p$. Then,
+$$
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum C_i^2}\}
+$$
+
+## 3. McDiermid Lemma
+
+$x_1 ... x_n$ independent, function $f$ satisfies that $\forall i$, $\forall x_1 ... x_n; x_1, ..., x_i', ..., x_n$, then
+$$
+|f(x_1, ..., x_n) - f(x_1, ..., x_i', ..., x_n)| \leq c_i
+$$
+is called stable.
+
+If $f$ is stable, then
+$$
+\mathbb{P}\left\{f(x_1, ..., x_n) - \mathbb{E}[f(x_1, ..., x_n)] \geq \epsilon\right\} \leq \mathrm{exp}\{-\frac{2\epsilon^2}{\sum C_i^2}\}
+$$
+
+## 4. Draw without replacement
+
+$a_1, ..., a_N \in \{0,1\}$ uniformly random draw $n$ numbers from $a_1, ..., a_N$, denote $x_1, ..., x_n$. Consider $P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)$
+
+1. Draw with replacement: $x_1, ..., x_n$ independent, Chernoff bound holds.
+
+2. Draw without replacement: $x_1, ..., x_n$ not independent, Chernoff bound holds. Actually, this is more concentrated. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

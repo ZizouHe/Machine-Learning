@@ -1,0 +1,52 @@
+---
+title: "Machine Learning Homework 7"
+author: "He Li, 2014012684"
+date: "2017/11/20"
+output: pdf_document
+---
+
+
+
+\newtheorem{pro}{Problem}
+
+\begin{pro}
+For any functional $f$ of classifier $h$, prove that
+$$
+E_{h\sim Q}[f(h)]\leq \ln E_{h\sim P}[\exp\{f(h)\}]+D(Q||P)
+$$
+\end{pro}
+\begin{proof}
+\begin{align*}
+E_{h\sim Q}[f(h)] &= E_{h\sim Q}[\ln e^{f(h)}]\\
+&=E_{h\sim Q}\ln e^{f(h)}\frac{dP}{dQ}]+D(Q||P)\\
+&\leq \ln E_{h\sim Q}[e^{f(h)}\frac{dP}{dQ}]+D(Q||P)\\
+&=\ln E_{h\sim P}[\exp\{f(h)\}]+D(Q||P)
+\end{align*}
+\end{proof}
+
+\begin{pro}
+Denote that $f(h)=n[\mathrm{err}_D(h)-\mathrm{err}_S(h)]^2$, prove that 
+$$
+\mathbb{P}\left[E_{h\sim P} \exp\{f(h)\}\geq \frac{3}{\delta}\right]\leq \delta
+$$
+\end{pro}
+
+\begin{proof}
+According to chernoff bound, 
+$$
+\mathbb{P}\left[|\mathrm{err}_D(h)-\mathrm{err}_S(h)|\geq \epsilon\right]\leq 2 e^{-2n\epsilon^2}
+$$
+Therefore, 
+$$
+\mathbb{P}[e^{f(h)}\geq t]=\mathbb{P}\left[|\mathrm{err}_D(h)-\mathrm{err}_S(h)|\geq \sqrt{\frac{\ln t}{n}}\right]\leq \frac{2}{t^2}
+$$
+\begin{align*}
+\therefore 
+E_{h\sim P}\exp\{f(h)\} 
+&=\int_0^{+\infty}\mathbb{P}[e^{f(h)}\geq t]dt \\
+&\leq \int_0^1 1dt+\int_1^{+\infty}\frac{2}{t^2}dt \\
+&=3
+\end{align*}
+By Markov's inequality, the result holds.
+\end{proof}
+

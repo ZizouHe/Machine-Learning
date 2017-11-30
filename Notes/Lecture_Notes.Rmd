@@ -1,0 +1,1856 @@
+---
+title: "Machine Learning Course Notes"
+author: "He Li, Ziheng Huang, Zehua Lai"
+date: "2017 Fall"
+header-includes:
+   - \usepackage{algorithm}
+   - \usepackage{algorithmic}
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    toc: yes
+  word_document: default
+  html_document: default
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+\newtheoremstyle{ttt}
+  {10pt}
+  {}
+  {\itshape}
+  {}
+  {\bfseries}
+  {.}
+  {.5em}
+  {}
+\theoremstyle{ttt}
+
+\newtheorem*{definition}{Definition} 
+\newtheorem*{markov}{Markov's Inequality} 
+\newtheorem*{cheby}{Chebychev's Inequality}
+\newtheorem*{hw}{Homework}
+\newtheorem*{chernoff}{Chernoff's Inequality}
+\newtheorem*{mgf}{Moment Generating Function}
+\newtheorem*{cherbnd}{Chernoff Bound(Homework)}
+\newtheorem*{hoeff}{Hoeffding Inequility}
+\newtheorem*{azuma}{Azuma's Inequality}
+\newtheorem*{mcdier}{McDiarmid Lemma}
+\newtheorem*{without}{Draw with/without replacement}
+\newtheorem*{union}{Union Bound}
+\newtheorem*{prop}{Proposition}
+\newtheorem*{lemma_h}{Lemma(Homework)}
+\newtheorem*{lemma}{Lemma}
+\newtheorem*{cher}{Chernoff Bound}
+\newtheorem*{hoe}{Hoeffding}
+\newtheorem*{azu}{Azuma}
+\newtheorem*{mcd}{McDiarmid}
+\newtheorem*{dra}{Draw with/without replacement}
+\newtheorem*{thm_h}{Theorem(Homework)}
+\newtheorem*{thm}{Theorem}
+\newtheorem*{cor}{Corollary}
+\newtheorem*{sauer}{Sauer's Lemma}
+\newtheorem*{lin}{Linear Classifier}
+\newtheorem*{app}{Game Theory}
+\newtheorem*{lagrange}{Lagrange Duality}
+\newtheorem{pro}{Problem}
+\newtheorem*{sad}{Saddle Point Theorem}
+\newtheorem*{kkt}{KKT-conditions}
+\newtheorem{ter}{Term Project}
+\newtheorem*{ssvm}{Soft-margin SVM}
+\newtheorem*{hl}{Hinge Loss}
+\newtheorem*{kt}{Kernel Trick}
+\newtheorem*{ab}{AdaBoost}
+\newtheorem*{Proposition}{Proposition}
+\newtheorem*{ph}{Proposition(Homework)}
+\newtheorem*{note}{Note}
+\newtheorem*{bs}{Bootstrap}
+\newtheorem*{bag}{Bagging}
+\newtheorem*{VNM}{Von Neumann Minmax Theorem}
+\newpage
+
+# Chapter 0. Preliminary
+
+## 0.1 Basic Inequality
+
+\begin{markov}
+Random variable $x > 0$, $\mathbb{E}[x]$ exists, $\forall k > 0$, we have
+\begin{align}
+\mathbb{P}\left(X \geq k\right) \leq \frac{\mathbb{E}[x]}{k}
+\end{align}
+\end{markov}
+
+
+\begin{cheby}
+Random variable $x$, $\mathbb{E}[x]$ exists, $\mathrm{Var}(x) = \sigma^2$, $\forall k > 0$, we have
+\begin{align}
+\mathbb{P}\left(|x -\mathbb{E}[x] | \geq k\right) \leq \frac{\sigma^2}{k} 
+\end{align}
+\end{cheby}
+
+\begin{hw}
+Random variable $x$, $x \sim \mathcal{N}(0,1)$. Define function $\Phi(u) = \mathbb{P}(x \geq u)$. Find elementary function $f, g$, s.t. 
+$$
+g(u) \leq \Phi(u) \leq f(u)
+$$
+\end{hw}
+
+
+\begin{chernoff}
+Random variable $x > 0$, $\mathbb{E}[x], \mathbb{E}[x^2], ...$ known, then $\forall k > 0$,
+\begin{align}
+\mathbb{P}(x \geq k) \leq \min_{i \geq 1} \frac{\mathbb{E}[x^i]}{k^i}
+\end{align}
+\end{chernoff}
+
+
+\begin{definition}
+\textbf{Moment generating function} is defined as:
+$$
+M_x(t) := \mathbb{E}[e^{tx}] = 1 + t\mathbb{E}[x] + \frac{t^2}{2} \mathbb{E}[x^2] + ...
+$$
+Then it is obvious that
+\begin{align}
+\mathbb{P}(x \geq k) \leq \inf_{t > 0} e^{-tk} \mathbb{E}[e^{tx}]
+\end{align}
+\end{definition}
+\begin{proof}
+When $x \geq k$
+$$
+e^{tk} \leq e^{tx}
+$$
+Given the fact that $e^{tx} > 0$,
+$$
+\int_{k}^\infty e^{tk} \mathrm{d} x \leq \int_{k}^\infty e^{tx} \mathrm{d} x \leq
+\mathbb{E}[e^{tx}]
+$$
+Therefore,
+$$
+\mathbb{P}(x \geq k) \leq e^{-tk} \mathbb{E}[e^{tx}]
+$$
+\end{proof}
+
+
+\begin{definition}
+Random variable $x$, $P = (p_1, ..., p_n)$. Then \textbf{Entropy} is defined as 
+\begin{align}
+H(x) = \sum_{i=1}^n p_i \log (\frac{1}{p_i})
+\end{align}
+\end{definition}
+
+
+\begin{definition}
+Random variable $x$, $P = (p_1, ..., p_n)$, $Q = (q_1, ..., q_n)$. Then \textbf{Related entropy} or \textbf{K-L divergence} is defined as
+\begin{align}
+D(P \| Q) := \sum_{i=1}^n p_i \log(\frac{p_i}{q_i})
+\end{align}
+Note that K-L divergence is not symmetric, $D(P \| Q)  \neq D(Q \| P)$.
+\end{definition}
+
+## 0.2 Concentration Inequality
+
+**Concentration Inequality** is one kind of inequality aiming at giving bound for the following function,
+\begin{align}
+\mathbb{P}\left(\left|\frac{1}{n} \sum_{i=1}^n x_i - \mathbb{E}(x)\right| \geq \epsilon\right)
+\end{align}
+
+
+\begin{cherbnd}
+$x_1 ... x_n$ are independent Bernoulli variable, $\mathbb{E}\{x_i\} = p$. Then $\forall \delta > 0$,  
+\begin{align}
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \delta) \leq \mathrm{exp}\{-nD_B^{(e)}(p+\delta \| p)\}
+\end{align}
+\end{cherbnd}
+\begin{proof}
+Denote $\hat{x} = \sum_{i=1}^n x_i$, then $M_{\hat{x}}(t) = (1 - p + pe^t)^n$. Then,
+$$
+P\left(\hat{x} \geq n(p + \delta)\right) \leq \inf_{t > 0} e^{-tn(p + \delta)} (1 - p + pe^t)^n
+$$
+The right-hand side is to minimize $-t(p + \delta) + \ln (1 - p + pe^t)$. Therefore,
+$$
+\frac{pe^t}{1 - p + pe^t} = p + \delta
+$$
+Solve it, we find that
+\begin{align*}
+\inf_{t > 0} e^{-tn(p + \delta)} (1 - p + pe^t)^n 
+&= \exp \left\{-t(p + \delta) + \ln \frac{1 - p}{1 - p - \delta}\right\} \\
+&= \mathrm{exp}\{-nD_B^{(e)}(p+\delta \| p)\}
+\end{align*}
+\end{proof}
+
+
+**Note**
+
+1. if $x$ is distributed on $[0,1]$ and $\mathbb{E}\{x_i\} = p$, $x$ is not Bernoulli distribution, then by Jessan’s inequality we have $\mathbb{E}[e^{tx}] < ...$, we know it is better. 
+2. if $x$ are not identical distributed, only with independency the result remains the same.
+3. **Additive Chernoff bound(Homework)**
+\begin{align}
+\mathrm{exp}\{-nD_B^{(e)}(p+\delta \| p)\} \leq e^{-2n\delta^2}
+\end{align}
+
+\begin{proof}
+Denote $f(\delta) = D_B(p + \delta \| p) - 2\delta^2$, $f(0) = 0$. 
+\begin{align*}
+f'(\delta) &= \mathrm{ln}(\frac{p+\sigma}{p}) - \mathrm{ln}(\frac{1 - p - \delta}{1 - p}) - 4\delta \\
+f''(\delta) &= \frac{2}{(p + \delta)(1 - p - \delta)} - 4
+\end{align*}
+
+Therefore, $f'(0) = 0$ and $f''(\delta) \geq 0$ if $\delta \geq 0$. Therefore, 
+$$
+f(\delta) \leq f(0) = 0
+$$
+Therefore,
+$$
+\mathrm{exp}\{-n D_B(p + \delta \| p)\} \leq e^{-2n \delta^2}
+$$
+\end{proof}
+
+
+\begin{hoeff}
+$x_1 ... x_n$ are independent, and distributed on $[a_i,b_i]$, $\mathbb{E}\{x_i\} = p$. Then,
+\begin{align}
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum (b_i - a_i)^2}\}
+\end{align}
+\end{hoeff}
+\begin{proof}
+We first prove $\mathbb{E}[e^{t(x - \mu)}] \leq \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}$.
+
+From Jenson's inequility, $\mathbb{E}[e^{t(x - \mu)}]$ is maximized when $x$ is distributed on boundary of domain, which makes $x$ a Bernoulli distribution. Assume $P(x = b) = p$, 
+\begin{align*}
+\mathbb{E}[e^{t(x - \mu)}] &= p e^{t(b - \mu)} + (1 - p) e^{t(a - \mu)} \\
+F(x) &= \mathbb{E}[e^{t(x - \mu)}] - \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}
+\end{align*}
+with some calculation, we can find that $\mathrm{max} \; F(x) \leq 0$. Therefore, $\mathbb{E}[e^{t(x - \mu)}] \leq \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}$. Then,
+\begin{align*}
+P\left(\frac{1}{n} \sum_{i = 1}^n x_i - \frac{1}{n} \sum_{i = 1}^n \mu_i \geq \epsilon\right) 
+&= P\left(\sum_{i = 1}^n x_i -  \sum_{i = 1}^n \mu_i \geq n\epsilon\right) \\ 
+&\leq \inf_{t > 0} e^{-tn\epsilon} \mathbb{E}[e^{t(\sum_{i = 1}^n x_i -  \sum_{i = 1}^n \mu_i)}] \\
+&= \inf_{t > 0} e^{-tn\epsilon} \prod_{i = 1}^n \mathbb{E}[e^{t(x_i - \mu_i)}] \\ 
+&\leq \inf_{t > 0} \mathrm{exp}\{-tn\epsilon + \frac{1}{8} t^2 \sum_{i = 1}^n (b_i - a_i)^2\} \\
+&\leq \mathrm{exp}\{\frac{-2n^2\epsilon^2}{\sum_{i = 1}^n (a_i - b_i)^2}\}
+\end{align*}
+\end{proof}
+
+
+
+**Question**: without independency, is concentration here exists? No, since $\mathbb{E}(AB) \neq \mathbb{E}(A)\mathbb{E}(B)$.
+
+
+\begin{definition}
+Random variables $S_0 ... S_n ...$ are \textbf{martingale} if $\forall i$, (fair game)
+$$
+\mathbb{E}[S_i | S_{i-1}, ... S_0] = S_{i-1}
+$$
+Denote $X_i = S_i - S_{i-1}$, $X_i$ is called \textbf{martingale difference}.
+\end{definition}
+
+
+\begin{azuma}
+$x_1 ... x_n$ are martingale difference, $|x_i| \leq C_i$, $S_0 = 0$, $\mathbb{E}\{x_i\} = p$. Then,
+\begin{align}
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum C_i^2}\}
+\end{align}
+\end{azuma}
+
+
+\begin{definition}
+Random variables $S_0 ... S_n ...$ are \textbf{super martingale} if $\forall i$,
+$$
+\mathbb{E}[S_i | S_{i-1}, ... S_0] \leq S_{i-1}
+$$
+Denote $X_i = S_i - S_{i-1}$, $X_i$ is called \textbf{super martingale difference}.
+\end{definition}
+
+Note that **Azuma's Inequality** also holds for super martingale difference. Given that $x_1 ... x_n$ are super martingale difference, $|x_i| \leq C_i$, $S_0 = 0$, $\mathbb{E}\{x_i\} = p$. Then,
+$$
+P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)  \leq \mathrm{exp}\{-\frac{2n^2\epsilon^2}{\sum C_i^2}\}
+$$
+
+
+\begin{definition}
+$x_1 ... x_n$ are independent random variable, function $f$ is called \textbf{stable} if it satisfies that $\forall i$, $\forall x_1 ... x_n; x_1, ..., x_i', ..., x_n$,
+\begin{align}
+|f(x_1, ..., x_n) - f(x_1, ..., x_i', ..., x_n)| \leq c_i
+\end{align}
+\end{definition}
+
+\begin{mcdier}
+$x_1 ... x_n$ are independent random variable, $f$ is stable, then
+\begin{align}
+\mathbb{P}\left\{f(x_1, ..., x_n) - \mathbb{E}[f(x_1, ..., x_n)] \geq \epsilon\right\} \leq \mathrm{exp}\{-\frac{2\epsilon^2}{\sum C_i^2}\}
+\end{align}
+\end{mcdier}
+
+
+\begin{without}
+$a_1, ..., a_N \in \{0,1\}$ are random variables, uniformly distributed. Draw $n$ numbers from $a_1, ..., a_N$, denote $x_1, ..., x_n$. Consider $P(\frac{1}{n} \sum x_i - \mathbb{E}[\frac{1}{n} \sum x_i] \geq \epsilon)$
+
+1. Draw with replacement: $x_1, ..., x_n$ independent, Chernoff bound holds.
+
+2. Draw without replacement: $x_1, ..., x_n$ not independent, Chernoff bound holds. Actually, it's more concentrated. 
+\end{without}
+
+## 0.3 $\sigma^2$-subgaussian
+
+\begin{definition}
+X is called $\sigma^2$-subgaussian if
+\begin{align}
+\log E[e^{\lambda(X-\mathbb{E}X)}]\leq\frac{1}{2}\lambda^2\sigma^2 = \log \left\{MGF(\mathcal{N}(0,\delta^2))\right\}
+\end{align}
+where MGF is moment generating function.
+\end{definition}
+
+\begin{cher}
+If X is $\sigma^2$-subgaussian, then,
+\begin{align}
+\mathbb{P}[X>\mathbb{E}X+t]\leq e^{-\frac{t^2}{2\sigma^2}}
+\end{align}
+\end{cher}
+
+\begin{proof}
+Using moment generating function,
+\begin{align*}
+\mathbb{P}[X>\mathbb{E}X+t] &\leq \inf_{\lambda > 0} e^{-\lambda t} \mathbb{E}\left[e^{\lambda[X- \mathbb{E}(X)]}\right] \\
+&\leq \inf_{\lambda > 0} e^{-\lambda t} e^{\frac{1}{2}\lambda^2\sigma^2} \\
+&= e^{-\frac{t^2}{2\sigma^2}}
+\end{align*}
+\end{proof}
+
+\begin{hoe}
+If $a\leq X \leq b$ then X is $\frac{1}{4}(b-a)^2$-subgaussian.
+\end{hoe}
+
+\begin{proof}
+Let $\log \mathbb{E}[e^{\lambda(X-\mathbb{E}X)}] = \phi (\lambda)$, then
+\begin{align*}
+\phi'(\lambda)&=\frac{\mathbb{E}\left[(X-\mathbb{E}X)e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]}\\
+\phi''(\lambda)&=\frac{\mathbb{E}\left[(X-\mathbb{E}X)^2 e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]}-\frac{\mathbb{E}\left[(X-\mathbb{E}X)e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]^2}\\
+&\leq \frac{\mathbb{E}\left[(X-\mathbb{E}X)^2 e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]}\\
+&\leq \frac{1}{4}(a-b)^2
+\end{align*}
+Here
+$$
+\frac{\mathbb{E}\left[(X-\mathbb{E}X)e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]^2} \geq \frac{\mathbb{E}\left[(X-\mathbb{E}X)\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]^2} = 0
+$$
+because when $X - \mathbb{E}(X) > 0$,  $e^{\lambda(X-\mathbb{E}X)} > 1$ and when $X - \mathbb{E}(X) \leq 0$, $e^{\lambda(X-\mathbb{E}X)} \leq 1$. 
+And $\frac{\mathbb{E}\left[(X-\mathbb{E}X)^2e^{\lambda(X-\mathbb{E}X)}\right]}{\mathbb{E}[e^{\lambda(X-\mathbb{E}X)}]}
+\leq \frac{1}{4}(a-b)^2$ can be proved by the change of probability measure.
+\end{proof}
+
+
+\begin{azu}
+${X_t}$ are random variables, $\mathbb{E}[X_t|\mathcal{F}_{t-1}]=X_{t-1}$(martingale), $\Delta_t = X_t - X_{t-1}$. If $a_t \leq \Delta_t \leq b_t$, then $X_t$ is $\frac{1}{4}\sum_{i=1}^t(b_i-a_i)^2$-subgaussian.
+\end{azu}
+
+\begin{proof}
+$\mathbb{E}X_t = 0$
+\begin{align*}
+\mathbb{E}e^{\lambda X_t} &= \mathbb{E}e^{\lambda (X_{t-1}+\Delta_t)}\\
+&=\mathbb{E}\left\{\mathbb{E}\left[e^{\lambda (X_{t-1}+\Delta_t)}|\mathcal{F}_{t-1}\right]\right\} \\
+&=\mathbb{E}\left\{e^{\lambda X_{t-1}}E\left[e^{\lambda \Delta_t}|\mathcal{F}_{t-1}\right]\right\} \\
+&\leq \mathbb{E}\left[e^{\lambda X_{t-1}}\right]e^{\frac{1}{8}\lambda^2(b_t-a_t)^2} \\
+&... \\
+&\leq \exp\left\{\frac{1}{8}\sum_{i=1}^t(b_i-a_i)^2\right\}
+\end{align*}
+\end{proof}
+
+
+\begin{mcd}
+$X_1, X_2, ..., X_n$ independent r.v. $f(x_1,x_2,...,x_n)$
+$$
+D_i f = sup_{x_{-i}}sup_{x,y}|f(x_{-i},x)-f(x_{-i},y)|
+$$
+then $f(X_1, X_2, ..., X_n)$ is $\frac{1}{4}\sum_{i=1}^n D_if^2$-subgaussian.\footnote{Probability in High Dimension (Princeton).} 
+\end{mcd}
+
+\begin{proof}
+Let $Z_i = E[f(X_1,...,X_n)|X_1,...,X_i]$, then $f-E[f] = \sum_{i=1}^n Z_i-Z_{i-1}$. Note that
+$$
+E[Z_i|X_1,...,X_{i-1}]=E[f(X_1,...,X_n)|X_1,...,X_{i-1}] = Z_{i-1}
+$$
+$Z_i$ is martingale (Doob martingale).
+\end{proof}
+
+\begin{dra}
+$E[e^{\lambda (X_1+...+X_n)}] \leq E[e^{\lambda (X_1'+...+X_n')}]$.
+\end{dra}
+
+\begin{proof}
+Taylor expansion: $E[(X_1+...+X_n)^i] \leq E[(X_1'+...+X_n')^i]$
+\end{proof}
+
+\newpage
+
+# Chapter 1. VC Dimension
+
+## 1.1 Empirical Risk Minimiaztion
+
+We take some simple classifiers as examples. Consider $(x_i, y_i)_{i=1}^n$, $x_i \in \mathbb{R}^d, x = (x^{(1)}, ..., x^{(d)})$ are called instance, $y \in \{\pm 1\}$ are called label.
+
+1. Decision Tree: hypothesis space $\mathcal{F} = \{\mathrm{all \; decision \; tree}, \mathrm{depth} \leq \alpha\}$
+
+2. Linear Classifier: hypothesis space $\mathcal{F} =\left\{(\omega, b): \omega \in \mathbb{R}^d, b \in \mathbb{R}, \|\omega\| = 1\right\}$, then classifier is:
+$$
+f(x) = \mathrm{sgn}(\omega^T x + b)
+$$
+
+
+\begin{definition}
+Given $\mathcal{F}$, training data $(x_i, y_i)_{i=1}^n$. \textbf{Empirical Risk Minimiaztion(ERM)} is a algorithm, which finds $f \in \mathcal{F}$, s.t. 
+\begin{align}
+\hat{f} := \mathop{\mathrm{argmin}}\limits_{f \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^n I\left[y_i \neq f(x_i)\right]
+\end{align}
+\end{definition}
+
+
+\begin{definition}
+\textbf{Empirical Error} measures $\hat{f}$'s performance on training data, denoted as
+\begin{align}
+\mathbb{P}_S(y_i \neq f(x_i)) := \frac{1}{n} \sum_{i=1}^n I\left[y_i \neq \hat{f}(x_i)\right]
+\end{align}
+where $S = (x_i, y_i)_{i=1}^n$
+
+\textbf{Generalization Error} measures $\hat{f}$'s performance on test data, denoted as 
+\begin{align}
+\mathbb{P}_D(y_i \neq f(x_i)) = \mathop{\mathbb{E}}\limits_{(x,y) \sim D}\{I(y \neq \hat{f}(x))\}
+\end{align}
+\end{definition}
+
+Note that a small empirical error cannot indicate a small generalization error(cannot using Chernoff bound), since on training data, $z_i = I\left[y_i \neq \hat{f}(x_i)\right]$ are not independent. 
+
+## 1.2 Finite Hypothesis Space
+
+We consider finite hypothesis space first. 
+
+\begin{union}
+Consider $\mathcal{F}$ is finite, $|\mathcal{F}| < \infty$. ERM learns $\hat{f} \in \mathcal{F}$, then 
+\begin{align}
+P\left\{\mathbb{P}_D(y_i \neq f(x_i)) - \mathbb{P}_S(y_i \neq f(x_i)) \geq \epsilon \right\} \leq |\mathcal{F}| e^{-2n\epsilon^2}
+\end{align}
+\end{union}
+\begin{proof}
+Fix $f \in \mathcal{F}$, $P\left\{\mathbb{P}_D(y_i \neq f(x_i)) - \mathbb{P}_S(y_i \neq f(x_i)) \geq \epsilon \right\}$ satisties Chernoff bound. 
+$$
+P\left\{\mathbb{P}_D(y_i \neq f(x_i)) - \mathbb{P}_S(y_i \neq f(x_i)) \geq \epsilon \right\} \leq e^{-2n\epsilon^2}
+$$
+Therefore, we have union bound
+$$
+P\left\{\exists f \in \mathcal{F}, \;\mathbb{P}_D(y_i \neq f(x_i)) - \mathbb{P}_S(y_i \neq f(x_i)) \geq \epsilon \right\} \leq |\mathcal{F}| e^{-2n\epsilon^2}
+$$
+\end{proof}
+
+## 1.3 VC Bound
+
+Now we consider the situation in infinite hypothesis space. Denote $z_i = (x_i, y_i)$, $\phi_f(z_i) = I(y_i \neq f(x_i)$. Consider:
+\begin{align}
+\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\frac{1}{n} \sum_i \phi_f(z_i) - \mathbb{E}[\phi_f(z)]\right| \geq \epsilon\right)
+\end{align}
+
+**Step I (Double Sample Trick)**
+
+\begin{prop}
+$X_1, ..., X_n, X_{n+1}, ..., X_{2n}$ are i.i.d Bernoulli R.V., $\mathbb{E}(X) = p$. Denote $\nu_1 = \frac{1}{n} \sum_{i = 1}^n X_i$, $\nu_2 = \frac{1}{n} \sum_{i = n+1}^{2n} X_i$. If $n \geq \frac{\ln2}{\epsilon^2}, \epsilon > 0$, then
+\begin{align}
+\frac{1}{2} \mathbb{P}\left(|\nu_1 - p| \geq 2\epsilon\right) \leq \mathbb{P}\left(|\nu_1 - \nu_2| \geq \epsilon\right) \leq 2\mathbb{P}\left(|\nu_1 - p| \geq \frac{\epsilon}{2}\right)
+\end{align}
+\end{prop}
+\begin{proof}
+Right inequality: 
+$$
+|\nu_1 - \nu_2| \geq \epsilon \Longrightarrow |\nu_1 - p| \geq \frac{\epsilon}{2} \; \mathrm{or} \;|\nu_2 - p| \geq \frac{\epsilon}{2}
+$$
+Therefore,
+\begin{align*}
+\{|\nu_1 - \nu_2| \geq \epsilon\} 
+&\subset \{|\nu_1 - p| \geq \frac{\epsilon}{2}\} \cup \{|\nu_2 - p| \geq \frac{\epsilon}{2}\} \\
+\mathbb{P}\left(|\nu_1 - \nu_2| \geq \epsilon\right)
+&\leq \mathbb{P}\left(|\nu_1 - p| \geq \frac{\epsilon}{2} \cup |\nu2 - p| \geq \frac{\epsilon}{2}\right) \\
+&\leq \mathbb{P}\left(|\nu_1 - p| \geq \frac{\epsilon}{2}\right) + \mathbb{P}\left(|\nu_2 - p| \geq \frac{\epsilon}{2}\right) \\
+&= 2\mathbb{P}\left(|\nu_1 - p| \geq \frac{\epsilon}{2}\right)
+\end{align*}
+
+Similarily, left inequality: 
+$$
+|\nu_1 - p| \geq 2\epsilon, |\nu_2 - p| \leq \epsilon \Longrightarrow |\nu_1 - \nu_2| \geq \epsilon
+$$
+\end{proof}
+
+
+\begin{lemma_h}
+\begin{align}
+&\frac{1}{2}\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\frac{1}{n} \sum_{i=1}^n \phi_f(z_i) - \mathbb{E}[\phi_f(z)]\right| \geq 2 \epsilon\right) \notag \\
+\leq &\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\frac{1}{n} \sum_{i=1}^n \phi_f(z_i) - \frac{1}{n} \sum_{i=n+1}^{2n} \phi_f(z_i)\right| \geq \epsilon\right) \notag \\
+\leq &2\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\frac{1}{n} \sum_{i=1}^n \phi_f(z_i) - \mathbb{E}[\phi_f(z)]\right| \geq \frac{\epsilon}{2}\right)
+\end{align}
+
+\end{lemma_h}
+\begin{proof}
+We know that $\phi_f(z_1), ..., \phi_f(z_n), \phi_f(z_{n+1}), ..., \phi_f(z_{2n})$ are i.i.d Bernoulli R.V.. $\mathbb{E}(\phi_f(z)) = p$. Denote $\nu_1 = \frac{1}{n} \sum_{i = 1}^n \phi_f(z_i)$, $\nu_2 = \frac{1}{n} \sum_{i = n+1}^{2n} \phi_f(z_i)$. 
+
+Consider the right inequality, we have
+$$
+\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon \Longrightarrow \mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq \frac{\epsilon}{2} \; \mathrm{or} \; \mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}} \;|\nu_2 - p| \geq \frac{\epsilon}{2}
+$$
+Therefore, 
+\begin{align*}
+\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon\} 
+&\subset \{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq \frac{\epsilon}{2}\} \cup \{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_2 - p| \geq \frac{\epsilon}{2}\} \\
+\therefore \;
+\mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon\right)
+&\leq \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq \frac{\epsilon}{2} \cup \mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu2 - p| \geq \frac{\epsilon}{2}\right) \\
+&\leq \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq \frac{\epsilon}{2}\right) + \mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_2 - p| \geq \frac{\epsilon}{2}\right) \\
+&= 2\mathbb{P}\left(\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq \frac{\epsilon}{2}\right)
+\end{align*}
+
+Similarily, assume $f \in \mathcal{H}$ such that $\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p|=|\nu_1' - p'|$, then
+\begin{align*}
+&\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq 2\epsilon \; \mathrm{and} \; |\nu_2' - p'| \leq \epsilon \Longrightarrow \mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon \\
+\therefore \; 
+&\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq 2\epsilon\right\} 
+\cap \left\{|\nu_2' - p'| \leq \epsilon\right\} 
+\subset \left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon\right\} \\
+\therefore \; 
+&\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon\right\}\right)
+\geq
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+ \mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right)
+\end{align*}
+We have an upper bound on $\mathbb{P}\left(\left\{|\nu_2' - p'| \geq \epsilon\right\}\right)$. When $n \geq \frac{\ln2}{2\epsilon^2}$,
+\begin{align*}
+\mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right) 
+&= 1 -  \mathbb{P}\left(\left\{|\nu_2' - p'| \geq \epsilon\right\}\right) \\
+&\geq 1 - \exp\{-2n\epsilon^2\} \\
+&\geq \frac{1}{2}
+\end{align*}
+\begin{align*}
+\therefore \;
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - \nu_2| \geq \epsilon\right\}\right)
+&\geq
+\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+\mathbb{P}\left(\left\{|\nu_2' - p'| \leq \epsilon\right\}\right) \\
+&\geq \frac{1}{2}\mathbb{P}\left(\left\{\mathop{\mathrm{sup}}\limits_{f \in \mathcal{H}}|\nu_1 - p| \geq 2\epsilon\right\}\right)
+\end{align*}
+\end{proof}
+
+
+**Step II (Symmetrization)**
+
+\begin{definition}
+Denote $N^{\mathcal{H}}(z_1, ..., z_n)$:
+$$
+N^{\mathcal{H}}(z_1, ..., z_n) := \# \left\{(\phi_f(z_1), ..., \phi_f(z_n)), f \in \mathcal{H}\right\}
+$$
+If $N^{\mathcal{H}}(z_1, ..., z_n) = 2^n$, then we call $\mathcal{H}$ \textbf{shatters} $\{z_1, ..., z_n\}$.
+
+Also $N^{\mathcal{H}}(n)$ is \textbf{growth function}
+$$
+N^{\mathcal{H}}(n) := \max_{z_1 ... z_n} N^{\mathcal{H}}(z_1 ... z_n)
+$$
+
+\end{definition}
+
+
+\begin{lemma}
+\begin{align}
+\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\nu_1(z) - \nu_2(z)\right| \geq \epsilon\right) \leq \mathbb{E}\left[N^{\mathcal{H}}(z_1, ..., z_n)\right] \, 2e^{-2n\epsilon^2} \leq N^{\mathcal{H}}(2n) \, 2e^{-2n\epsilon^2}
+\end{align}
+where $\nu_1(z) = \frac{1}{n} \sum_{i=1}^n \phi_f(z_i)$, $\nu_2(z) = \frac{1}{n} \sum_{i=n+1}^{2n} \phi_f(z_i)$.
+\end{lemma}
+\begin{proof}
+Draw a set with permutation, fix set (draw without replacement). Then,
+$$
+\mathop{\mathbb{P}}\limits_{\mathrm{permutation}}\left(\sup_{f \in \mathcal{H}} \left|\nu_1(z) - \nu_2(z)\right| \geq \epsilon\right)
+\leq  N^{\mathcal{H}}(z_1, ..., z_n)\, 2e^{-2n\epsilon^2}
+$$
+Take expectation,
+$$
+\mathop{\mathbb{E}}\limits_{\mathrm{set}}\left\{\mathop{\mathbb{P}}\limits_{\mathrm{permutation}}\left(\sup_{f \in \mathcal{H}} \left|\nu_1(z) - \nu_2(z)\right| \geq \epsilon\right)\right\}
+\leq  \mathbb{E}\left[N^{\mathcal{H}}(z_1, ..., z_n)\right] \, 2e^{-2n\epsilon^2}
+$$
+\end{proof}
+
+**Step III (VC-Dimension)**
+
+\begin{definition}
+\textbf{VC Dimension} of hypothesis space $\mathcal{H}$ is defined as the maximum value of $d$ s.t. 
+$$
+N^\mathcal{H}(d) = 2^d
+$$
+In other words, $\exists \{z_1, ..., z_d\}$, can be shattered by $\mathcal{H}$ while $\forall \{z_1, ..., z_{d+1}\}$, cannot be shattered by $\mathcal{H}$.
+\end{definition}
+For growth function $N^{\mathcal{H}(n)}$, we only know that $N^{\mathcal{H}}(n) \leq 2^n$. However, we don’t know how it grows actually, maybe exponential or polynomial. When $n$ is small can be exponential but when $n$ is large it is relatively smaller.
+
+
+\begin{sauer}
+For a set of $n$ elements, $\mathcal{N} = \{1, ..., n\}$, set $\mathcal{H} \subset 2^{\mathcal{N}}$. Then, 
+\begin{align}
+|\mathcal{H}| \leq \#\{x \subset \mathcal{N} \; | \; x \;\mathrm{is} \;\mathrm{shattered}\;\mathrm{by} \; \mathcal{H}\}
+\end{align}
+\end{sauer}
+
+\begin{proof}
+We first prove the Sauer's Lemma holds for a set of 1 elements. Note that empty set can be shattered by any set. Given this, $\#\{x \subset \mathcal{N} \; | \; x \;\mathrm{is} \;\mathrm{shattered}\;\mathrm{by} \; \mathcal{H}\} \geq 1$. And $\#\{x \subset \mathcal{N} \; | \; x \;\mathrm{is} \;\mathrm{shattered}\;\mathrm{by} \; \mathcal{H}\} = 2$ here if and only if $\mathcal{H} = 2^{\mathcal{N}}$. Therefore, $|\mathcal{H}| \leq \#\{x \subset \mathcal{N} \; | \; x \;\mathrm{is} \;\mathrm{shattered}\;\mathrm{by} \; \mathcal{H}\}$.
+
+Assume the lemma holds for any set with $k$ elements. We add $x$ into such set. For a $\mathcal{H}$, we divide it into two subsets where $\mathcal{H}_1$ contains sets that contains $x$ and $\mathcal{H}_2$ contains sets that does not contain $x$. Denote $\alpha(\mathcal{H}_i) := \#\{x \subset \mathcal{N} \; | \; x \;\mathrm{is} \;\mathrm{shattered}\;\mathrm{by} \; \mathcal{H}_i\}$. From the assumption, 
+\begin{align*}
+|\mathcal{H}_1| &\leq \alpha(\mathcal{H}_1) \\
+|\mathcal{H}_2| &\leq \alpha(\mathcal{H}_2)
+\end{align*}
+Denote subsets of $\mathcal{N}$ that can be shattered by both $\mathcal{H}_1$ and $\mathcal{H}_2$ as $P$. 
+For $\mathcal{H} = \mathcal{H}_1 \cup \mathcal{H}_2$, the union of $\mathcal{H}_1$ and $\mathcal{H}_1$ can shatter new subsets of $\mathcal{N} \cup \{x\}$ that has the following form: $P \cup \{x\}$. Therefore,
+\begin{align*}
+\alpha(\mathcal{H}) 
+&= \alpha(\mathcal{H}_1 \cup \mathcal{H}_2) \\
+&= \alpha(\mathcal{H}_1) + \alpha(\mathcal{H}_2) - \alpha(\mathcal{H}_1 \cup \mathcal{H}_2) + \alpha(\mathcal{H}_1 \cup \mathcal{H}_2) \\
+&\geq |\mathcal{H}_1| + |\mathcal{H}| \\
+&= |\mathcal{H}|
+\end{align*}
+\end{proof}
+
+
+\begin{cor}
+For a hypothesis space $\mathcal{H}$, if $VC(\mathcal{H}) = d$, then
+\begin{align}
+N^{\mathcal{H}}(n)
+\begin{cases}
+= 2^n \quad &\mathrm{if} \; n \leq d \\
+\leq \sum_{k=0}^d \dbinom{n}{k} \leq \left(\frac{ne}{d}\right)^d \quad &\mathrm{if} \; n > d
+\end{cases}
+\end{align}
+\end{cor}
+
+\begin{proof}
+By the definition of VC Dimension, $N^{\mathcal{H}}(n) = 2^n$ when $n \leq d$. When $n > d$,
+\begin{align*}
+\sum_{k=0}^d C_n^k 
+&= \sum_{k=0}^d \frac{n...(n-k+1)}{k!} \\
+&\leq \sum_{k=0}^d \frac{n^k}{k!} \\
+&= \sum_{k=0}^d \frac{d^k}{k!} \frac{n^k}{d^k} \\
+&\leq \left(\frac{n}{d}\right)^d \;\sum_{k=0}^d \frac{d^k}{k!} \\
+&\leq \left(\frac{n}{d}\right)^d \;\sum_{k=0}^{+\infty} \frac{d^k}{k!} \\
+&= \left(\frac{ne}{d}\right)^d
+\end{align*}
+\end{proof}
+
+
+\begin{thm}
+\begin{align}
+\mathbb{P}\left(\sup_{f \in \mathcal{H}} \left|\frac{1}{n} \sum_i \phi_f(z_i) - \mathbb{E}[\phi_f(z)]\right| \geq \epsilon\right) \leq \exp\left\{- O(n\epsilon^2)\right\} \left(\frac{ne}{d}\right)^d
+\end{align}
+\end{thm}
+
+
+\begin{thm}
+$\forall \delta > 0$, with probability $1 - \delta$ over the random draw of training data $\{(x_i, y_i)\}$, generalization error can be controled by empirical error and VC Dimension.
+\begin{align}
+\mathbb{P}_D(y \neq f(x)) \leq \mathbb{P}_S(y \neq f(x)) + O(\sqrt\frac{d \ln n + \ln\frac{1}{\delta}}{n}) 
+\end{align}
+where $d$ is the VC Dimension of hypothesis space. For ERM, denote $\hat{f}$ the optimal function $\hat{f} = \arg\min\limits_{f \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^n I(y_i \neq f(x_i))$, and $f^* = \arg \min\limits_{f \in \mathcal{H}} \mathbb{P}_D (y \neq f(x))$, then with probability $1 - \delta$, 
+\begin{align}
+\mathbb{P}_D(y \neq f^*(x)) \leq \mathbb{P}_S(y \neq \hat{f}(x)) + O(\sqrt\frac{d \ln n + \ln\frac{1}{\delta}}{n})
+\end{align}
+\end{thm}
+
+
+Note that for linear classifier, its VC Dimension = $r+1$ where $x \in \mathbb{R}^r$. 
+
+\newpage
+
+# Chapter 2. Supported Vector Machine
+
+In previous chapter, we use ERM which finds
+\begin{align}
+\hat{f} = \arg\min\limits_{f \in \mathcal{H}} \frac{1}{n} \sum_{i=1}^n I(y_i \neq f(x_i))
+\end{align}
+However, indicator function is hard to minimize. So we change classification error from 0-1 loss to other functions.
+
+## 2.0 Appendix Game Theory
+
+\begin{app}
+In two player zero-sum game, We have minmax = maxmin in a Nash equilibrium.\footnote{A course in Game Theory, P25}
+\begin{align}
+\max_{y\in A_2}\min_{x\in A_1} u_1(x,y) = \min_{x\in A_1}\max_{y\in A_2} u_1(x,y)
+\end{align}
+\end{app}
+
+\begin{proof}
+Denote $\min_{i \leq n}\max_{j \leq m} a_{ij} = a_{pq}$, $\max_{i \leq m} \min_{j \leq n} a_{ji} = a_{rt}$. Then
+$$
+a_{pq} \geq a_{rq} \geq a_{rt}
+$$
+Therefore, 
+$$
+\min_{i \leq n}\max_{j \leq m} a_{ij} \geq \max_{i \leq m} \min_{j \leq n} a_{ji}
+$$
+\end{proof}
+
+
+\begin{thm}
+For a matrix M, $\min_i\max_jM_{ij}\geq \max_j\min_iM_{ij}$ which means that if two player choose pure strategy and to act sequentially, second one gets an advantage.
+\end{thm}
+
+**Note that** if two players can choose mixed strategy, a Nash equilibrium exists, and the equation above holds.
+
+
+\begin{sad}
+Consider function $f(x,y)$, if fix $y$, $f(\cdot,y)$ is convex; if fix $x$, $f(x,\cdot)$ is concave. Then,
+\begin{align}
+\max_{y}\min_{x} f(x,y) = \min_{x}\max_{y} f(x,y)
+\end{align}
+\end{sad}
+
+## 2.1 KKT Conditions
+
+\begin{lagrange}
+Our \textbf{primal problem} is
+\begin{align}
+&\begin{cases}
+&\min f(x)  \\
+\mathrm{s.t.} \,
+&g_i(x)\leq 0 \\
+&h_i(x)=0
+\end{cases} \\
+\iff 
+&\begin{cases}
+&\min\limits_{x}\max\limits_{\mu,\lambda} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)  \\
+    \mathrm{s.t.} \,  &\lambda_i\geq 0
+\end{cases}   
+\end{align}
+And our \textbf{dual problem} is
+\begin{align}
+\begin{cases}
+    &\max_{\mu,\lambda} \min_{x} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)  \\
+    \mathrm{s.t.} \,  &\lambda_i\geq 0
+\end{cases}
+\end{align}
+Denote $L(x, \mu, \lambda) = f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)$, $(x_1, \mu_1, \lambda_1)$ the solution of primal problem, $(x_2, \mu_2, \lambda_2)$ the solution of dual problem. Then we have
+$$
+L(x_1, \mu_1, \lambda_1) \geq L(x_2, \mu_2, \lambda_2)
+$$
+\end{lagrange}
+
+
+\begin{kkt}
+The following 4 conditions are KKT conditions:
+
+(1) Stationary
+$\left.\nabla L(x,\lambda,\mu)\right|_{x^*,\lambda^*,\mu^*}=0$
+\\
+(2) Primal Feasibility
+$h_i(x^*)=0, g_i(x^*)\leq 0$
+\\
+(3) Dual Feasible
+$\lambda^*\geq 0$
+\\
+(4)Complementary slackness
+$\lambda_ig_i(x^*)=0$
+\end{kkt}
+
+
+\begin{thm}
+KKT conditions are necessary condition. If primal and duality problem have a same solution, then this solution satisfies KKT conditions.
+\end{thm}
+\begin{proof}
+Denote $(x^*, \lambda^*,\mu^*)$ the solution of primal and dual problems. Obviously, it satisfies (1), (2) and (3) of KKT conditions. 
+
+For (4), consider the primal problem, if $g_i(x^*) < 0$, then $\lambda_i(x^*)$ should equal to 0 in order to max the primal function. Therefore, $\lambda_i g_i(x^*) = 0$.
+\end{proof}
+
+
+\begin{thm}
+If $f(x), g_i(x)$ are convex and $h_i(x)$ is linear, then KKT conditions are sufficient condition, which means
+\begin{align*}
+&\begin{cases}
+&\min\limits_{x}\max\limits_{\mu,\lambda} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)  \\
+    \mathrm{s.t.} \,  &\lambda_i\geq 0
+\end{cases} 
+\iff 
+&\begin{cases}
+    &\max_{\mu,\lambda} \min_{x} f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)  \\
+    \mathrm{s.t.} \,  &\lambda_i\geq 0
+\end{cases}
+\end{align*}
+\end{thm}
+\begin{proof}
+First, a $x_0$ satisties the above conditions also satisfies the constraints in primal and dual problems. 
+
+Denote $x1$ the solution of primal problem and $x_2$ the solution of dual problem, deonte $L(x,\mu,\lambda) = f(x) + \sum\limits_i \mu_i h_i(x) + \sum\limits_i \lambda_i g_i(x)$. 
+
+With the additional condition, $L(x,\mu,\lambda)$ is a convex function w.r.t $x$, then $x_0 = \arg\min\limits_x L(x,\mu,\lambda)$. Therefore, 
+$L(x_0,\mu,\lambda) \leq L(x_2,\mu,\lambda) \leq L(x_1,\mu,\lambda)$. 
+
+Note that $x_0$ satisfies primal constraints and $x_2$ is the argmin of primal problem. Therefore, 
+$L(x_1,\mu,\lambda) \leq L(x_0,\mu,\lambda)$. Therefore, we have our conclusion that
+$$
+L(x_0,\mu,\lambda) = L(x_2,\mu,\lambda) = L(x_1,\mu,\lambda)
+$$
+\end{proof}
+
+
+Let $L(x,\mu,\lambda) = f(x)+\sum\mu_ih_i(x)+\sum\lambda_ig_i(x)$, solve $\frac{\partial L}{\partial x}=0$ we can get $x^*=\phi(\mu,\lambda)$. It suffices to solve $max_{\mu,\lambda} f(\phi(\mu,\lambda))+\sum\mu_ih_i(\phi(\mu,\lambda))+\sum\lambda_ig_i(\phi(\mu,\lambda))$.
+
+## 2.2 Supported Vector Machine
+
+\begin{lin}
+Note that $x \in \mathbb{R}^d$, $y \in \{\pm1\}$, $\mathcal{H} = \left\{f(x) | f(x) = \mathrm{sgn} (w^T x + b)\right\}$. Here we want to solve a constrained optimization problem,
+\begin{align}
+&\max\limits_{w, b} t \quad \mathrm{s.t.} \notag \\
+&\begin{cases}
+y_i(w^Tx_i +b) \geq t \\
+\|w\| = 1
+\end{cases}
+\end{align}
+The above can also be rewirtten as
+\begin{align}
+&\min\limits_{w,b} \frac{1}{2}\|w\|^2 \notag \\
+\mathrm{s.t.} \quad &y_i(w^Tx_i+b)\geq 1
+\end{align}
+\end{lin}
+
+
+The linear classifier problem is
+\begin{align}
+&\begin{cases}
+&\min\limits_{w,b} \frac{1}{2}\|w\|^2 \\
+\mathrm{s.t.} \, &y_i(w^Tx_i+b)\geq 1
+\end{cases} 
+\iff &\begin{cases}
+&\min\limits_{w,b,\lambda_i}L(w,b)=\frac{1}{2}\|w\|^2-\sum\lambda_i[y_i(w^Tx_i+b)-1]\\
+\mathrm{s.t.} \, &\lambda_i\geq 0
+\end{cases}
+\end{align}
+
+$L(w,b)=\frac{1}{2}\|w\|^2-\sum\lambda_i[y_i(w^Tx_i+b)-1]$, $w^*=\sum\lambda_iy_ix_i$, $\sum\lambda_iy_i=0$. By KKT condition, $\lambda^*_i[y_i(w^{*T}x_i+b^*)-1]=0$. $\lambda^*_i = 0$ for all $(x_i,y_i)$ that are not closest to the hyperspace. $\lambda^*_i \neq 0$ for all support vector. It is the **Support Vector Machine (SVM)**.
+
+## 2.3 Soft-margin SVM
+
+\begin{ssvm} How to find a linear classifier when the data set is not seperable? The soft-margin SVM can be defined as:
+\begin{align}
+&\min_{w,b,\xi_i} \frac{1}{2} \|\omega\|^2 + C \sum_i \xi_i \notag \\
+&s.t. \quad
+\begin{cases}
+y_i(\omega^Tx_i + b) \geq 1 - \xi_i \\
+\xi_i \geq 0
+\end{cases}
+\end{align}
+The soft-margin SVM can be rewritten as
+\begin{align}
+&\max_{\lambda_i} \sum_i \lambda_i - \frac{1}{2} \sum_{i,j} \lambda_i\lambda_j y_i y_j (x^T_i x_j) \notag \\
+&s.t. \quad
+\begin{cases}
+0 \leq \lambda_i \leq C \\
+\sum\limits_i \lambda_i y_i = 0 \\
+\end{cases}
+\end{align}
+\end{ssvm}
+
+
+
+\begin{hl}
+The above sotf-margin SVM can also be rewritten as a optimization problem without constraint. Using hinge loss, the above problem is as same as:
+\begin{align}
+\min_{\omega, b} \frac{1}{2} \| \omega\|^2 + C \sum_i \left[1 - y_i (\omega^T x_i +b)\right]_+
+\end{align}
+where 
+\begin{align}
+x_+ = \;
+\begin{cases}
+0 \quad x \leq 0 \\
+x \quad x > 0
+\end{cases}
+\end{align}
+\end{hl}
+
+
+
+Here we use hinge loss as a surrogate loss of 0-1 loss, which has the following two good properties:
+
+- hinge loss is the upper bound of 0-1 loss.
+- hinge loss is computationally efficient.
+- although hinge loss is not differentiable everywhere, it is convex.
+
+## 2.4 Kernel Method
+
+Sometimes we want to do some mapping on the original space.
+\begin{align}
+&\max_{\lambda_i} \sum_i \lambda_i - \frac{1}{2} \sum_{i,j} \lambda_i\lambda_j y_i y_j (\phi(x_i)^T \phi(x_j)) \notag \\
+&s.t. \quad
+\begin{cases}
+0 \leq \lambda_i \leq C \\
+\sum\limits_i \lambda_i y_i = 0 \\
+\end{cases}
+\end{align}
+
+where $x = (x^{(1), ..., x^{(d)}})$, and for example
+$$
+x : \mapsto \phi(x) = (x^{(1)}, ..., x^{(d)}, [x^{(1)}]^2, [x^{(1)}x^{(2)}], ..., [x^{(d)}]^2)
+$$
+However, sometimes we cannot have a explicit form of $\phi(\cdot)$. We have **kernel trick**.
+
+\begin{kt}
+We define a binary function $K(\cdot, \cdot)$,
+\begin{align}
+K(x_i, x_j) = \phi(x_i) \cdot \phi(x_j)
+\end{align}
+For example, Gaussian Kernel is
+$$
+K(x, x') = \exp\left\{-\frac{\|x - x'\|^2}{2\sigma^2}\right\}
+$$
+\end{kt}
+
+Reproducing kernel Hilbert space**???**
+
+\newpage
+
+# Chapter 3. Ensemble Learning
+
+## 3.1 Boosting(Meta Learning)
+
+**Idea Combine base classifier**
+
+1. generate
+2. combine
+
+
+
+\begin{ab}
+\begin{algorithm}
+\caption{AdaBoost}  
+\label{AdaBoost}  
+\begin{algorithmic}
+\REQUIRE Input $S = \{(x_1, y_1), ..., (x_n, y_n)\}$, $y_i \in \{\pm 1\}$
+\REQUIRE $\mathcal{A}$ a base learning algorithm
+\STATE Initialize $D_1(i) = \frac{1}{n}, \; i \in \{1, ..., n\}$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE Learn a base classifier $h_t(\cdot)$ using $\mathcal{A}$ with $D_t(\cdot)$ on S
+\STATE $\epsilon_t := \sum_{i=1}^n D_t(i) I[y_i \neq h_t(x_i)]$
+\STATE $\gamma_t := 1 - 2 \epsilon_t$
+\STATE $\alpha_t := \frac{1}{2} \ln \frac{1 + \gamma_t}{1 - \gamma_t}$
+\STATE $z_t := \sum_i  D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}$
+\STATE $D_{t+1}(i) = \frac{D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}}{z_t}$
+\ENDFOR 
+\STATE $f(x) = \sum_{t=1}^T \alpha_t h_t(x)$
+\RETURN $F(x) = \mathrm{sgn} \left[f(x)\right]$
+\end{algorithmic}  
+\end{algorithm}
+\end{ab}
+
+
+
+\begin{ph}
+AdaBoost is a greedy exponential loss with the following two properties: 
+\begin{align}
+\label{eqna}
+\alpha_t &= \arg\min_\alpha \sum_{i=1}^n D_t(i) \exp\{-y_i\alpha_t h_t(x_i)\} \\
+\label{eqnb}
+\prod_{t=1}^T z_t &= \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_i \sum_{t=1}^T \alpha_t h_t(x_i)\right\} = \frac{1}{n} \sum_i \exp\left\{-y_i f(x_i)\right\}
+\end{align}
+\end{ph}
+\begin{proof}
+We first prove (\ref{eqna}). Denote $F_t(\alpha) = \sum_{i=1}^n D_t(i) \exp\{-y_i\alpha_t h_t(x_i)\}$, when $F_t(\alpha)$ reaches its minimum,
+\begin{align*}
+\frac{\partial F_t(\alpha)}{\partial \alpha} &= \sum_{i=1}^n -y_ih_t(x_i) D_t(i) \exp\{-y_i\alpha_t h_t(x_i)\} = 0 \\ 
+\Longrightarrow \sum_{i=1}^n I[y_i \neq h_t(x_i)] D_t(i) \exp\{I[y_i \neq h_t(x_i)]\alpha_t\} &= \sum_{i=1}^n I[y_i = h_t(x_i)] D_t(i) \exp\{- I[y_i = h_t(x_i)]\alpha_t\}
+\end{align*}
+Given the fact that
+$$
+\sum_{i=1}^n D_t(i)I[y_i \neq h_t(x_i)] + \sum_{i=1}^n D_t(i)I[y_i = h_t(x_i)] = \sum_{i=1}^n D_t(i) = 1
+$$
+We have
+$$
+\epsilon_t \exp\{\alpha_t\} = (1 - \epsilon_t) \exp\{-\alpha_t\}
+$$
+Therefore,
+$$
+\alpha_t = \frac{1}{2} \ln \frac{1 - \epsilon_t}{\epsilon_t} = \frac{1}{2} \ln \frac{1 + \gamma_t}{1 - \gamma_t}
+$$
+
+We then prove (\ref{eqnb}). Given that
+\begin{align*}
+z_t :&= \sum_{i=1}^n  D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\} \\
+D_t(i) :&= \frac{D_{t-1}(i) \exp\left\{- y_i \alpha_{t-1} h_{t-1}(x_i)\right\}}{z_{t-1}}
+\end{align*}
+Obviously,
+\begin{align*}
+z_T &= \sum_{i=1}^n  D_T(i) \exp\left\{- y_i \alpha_T h_T(x_i)\right\} \\
+&= \sum_{i=1}^n  \frac{D_{T-1}(i) \exp\left\{- y_i \alpha_{T-1} h_{T-1}(x_i)\right\}}{z_{T-1}} \exp\left\{- y_i \alpha_T h_T(x_i)\right\} \\
+&...... \\
+&= \sum_{i=1}^n  D_{1}(i) \frac{\exp\left\{- y_i \sum_{t=1}^{T}\alpha_{t} h_{t}(x_i)\right\}}{\prod_{t=1}^{T-1}z_t}
+\end{align*}
+Therefore, we have our conclusion.
+$$
+\prod_{t=1}^{T}z_t = \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_i \sum_{t=1}^T \alpha_t h_t(x_i)\right\} = \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_i f(x_i)\right\}
+$$
+\end{proof}
+
+
+
+**Note** that $\exp\{-y_i f(x_i)\}$ is also a surrogate loss of 0-1 loss, differentiable as well as convex.
+
+
+
+\begin{ph}
+Suppose $\gamma_t \geq \gamma \geq 0$ for $t \in [1, ... ,T]$. Then
+\begin{align}
+P_s\left(yf(x) \leq 0\right) &= \frac{1}{n} I\left[y_i f(x_i) \leq 0\right] \notag\\
+&\leq \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i)\right\} \notag \\
+&\leq (1 - \gamma^2)^{\frac{T}{2}}
+\end{align}
+\end{ph}
+\begin{proof}
+We first prove that 
+$$
+\frac{1}{n} I\left[y_i f(x_i) \leq 0\right] \leq \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i)\right\}
+$$
+However, this is quite obvious given the fact that $I\left[y_i f(x_i) \leq 0\right] \leq \exp\left\{-y_if(x_i)\right\}$ everywhere(surrogate loss of 0-1 loss).
+
+We then prove that
+$$
+\frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i)\right\} \leq (1 - \gamma^2)^{\frac{T}{2}}
+$$
+We already know that 
+$$
+\frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i)\right\} = \prod_{t=1}^T z_t
+$$
+Therefore,
+\begin{align*}
+\frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i)\right\} 
+&= \prod_{t=1}^T \left\{\sum_{i=1}^n \exp\left\{\alpha_t\right\} D_t(i) I[y_i \neq h_t(x_i) + \exp\left\{-\alpha_t\right\} D_t(i) I[y_i = h_t(x_i)]\right\} \\
+&= \prod_{t=1}^T \left\{\exp\{\alpha_t\} \epsilon_t + \exp\{-\alpha_t\} (1-\epsilon_t) \right\}\\
+&= \prod_{t=1}^T \left\{\sqrt{\frac{1+\gamma_t}{1-\gamma_t}} \frac{1-\gamma_t}{2} + \sqrt{\frac{1-\gamma_t}{1+\gamma_t}} \frac{1+\gamma_t}{2} \right\} \\
+&= \prod_{t=1}^T \sqrt{1 - \gamma_t^2} \\
+&\leq (1 - \gamma^2)^{\frac{T}{2}}
+\end{align*}
+\end{proof}
+
+
+\begin{ph}
+Calculate the following function
+\begin{align}
+\sum_{i=1}^n D_{t+1}(i) I[y_i \neq h_t(x_i)] 
+\end{align}
+\end{ph}
+
+\begin{proof}
+\begin{align*}
+\sum_{i=1}^n D_{t+1}(i) I[y_i \neq h_t(x_i)] 
+&= \sum_{i=1}^n \frac{D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}}{\sum_i  D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}} I[y_i \neq h_t(x_i)] \\
+&= \frac{\sum_{i=1}^n \exp\left\{\alpha_t\right\} D_t(i) I[y_i \neq h_t(x_i)]}{\sum_{i=1}^n \exp\left\{\alpha_t\right\} D_t(i) I[y_i \neq h_t(x_i) + \exp\left\{-\alpha_t\right\} D_t(i) I[y_i = h_t(x_i)]} \\
+&= \frac{\exp\left\{\alpha_t\right\} \epsilon_t}{\exp\left\{\alpha_t\right\} \epsilon_t + \exp\left\{-\alpha_t\right\} (1-\epsilon_t)}
+\end{align*}
+Given that
+$$
+\alpha_t =  \frac{1}{2} \ln \frac{1 + \gamma_t}{1 - \gamma_t} = \frac{1}{2} \ln \frac{1 - \epsilon_t}{\epsilon_t}
+$$
+We have
+\begin{align*}
+\sum_{i=1}^n D_{t+1}(i) I[y_i \neq h_t(x_i)] 
+&= \frac{\frac{1 - \epsilon_t}{\epsilon_t} \epsilon_t}{\frac{1 - \epsilon_t}{\epsilon_t} \epsilon_t + (1-\epsilon_t)} \\
+&= \frac{1}{2}
+\end{align*}
+\end{proof}
+
+
+
+Note that
+\begin{align*}
+f(x) &= \sum_{t=1}^T \alpha_t h_t(x) \\
+\tilde{f}(x) &= \frac{\sum_{t=1}^T \alpha_t h_t(x)}{\sum_{t=1}^T \alpha_t}
+\end{align*}
+which is a convex combination of $h_t(x)$ and $y\tilde{f}(x) \in [-1,1]$. We can see this as a margin. In SVM margin represents Euclidean distance yet here margin denotes confidence. 
+
+Here we can see AdaBoost as multiplicative weight updating which greedily optimize its exponential loss. 
+Exponential loss = $\frac{1}{n}\sum_{i=1}^{n}exp\left\{-y_if(x_i)\right\}$. And,
+\begin{align*}
+f(x)=\sum_{t=1}^T\alpha_th_t(x) \\
+F(x)=\mathrm{sign}[f(x)]
+\end{align*}
+
+For $F\in CH_\tau(\mathcal{H})$, Obviously VC dimension grows at leat linearly by the sample size, $VC[CH_\tau(\mathcal{H})]>n$ so when the sample size is large the VC-dimension is too large. By practice, even when the training error is 0 when we continue to add samples the test error will still goes down, no overfitting problems.
+
+## 3.2 Margin Theory for Boosting
+
+Function:
+$$
+yf(x)=y \sum_{t}\alpha_th_t(x)
+$$
+is another distance but not Euclid of course.
+\begin{center}
+$x\mapsto(h_1(x),...h_T(x)), h_t(x)=\pm1$
+\\$yf(x)$ is a distance for $(x,y)$ defined by $(\alpha_1,...,\alpha_T)$
+\end{center}
+
+
+\begin{hw}
+Prove that $yf(x)=y\sum_t\alpha_th_t(x)$ is a distance of $(x,y)$.
+\end{hw}
+\begin{proof}
+
+We can rewrite the expression as:
+$$
+\frac{\sum_{t=1}^T\alpha_th_t(x)}{\sum_{t=1}^T\alpha_t} = \frac{<\alpha, h(x)>}{|\alpha|_1}
+$$
+where $\alpha = (\alpha_1, ..., \alpha_T)$ and $h(x) = \left(h_1(x), ... , h_T(x)\right)$. Therefore, it can be seen as the distance from $h(x)$ to the line $\alpha$. 
+
+Here margin can be seen as the distance between the predict vector to the linear combination of classifiers.
+
+\end{proof}
+
+If for most $(x_i,y_i)$, $y_if(x_i)$ is large then $f$ has good generalization ability, which is called data dependent generalization.
+
+For $CH(\mathcal{H})$, key idea: Approximation, to find a set that has a small VC-Dimension and is close to convex $\tau$, that is: $CH_N(\mathcal{H})\approx CH(\mathcal{H})$. Notice that: $CH(\mathcal{H})={\sum\alpha_th_t, \alpha_t \geq0, \sum\alpha_t=1}$. Then we have: 
+$$
+CH_N(\mathcal{H})={\frac{1}{N}\sum_{i=1}^Nh_{t_i},h_{t_i}\in\mathcal{H}}
+$$
+For given x, $\forall f\in CH(\mathcal{H}), \exists g\in CH_N(\mathcal{H})$, 
+$$f(x)\approx g(x)$$
+
+
+\begin{thm}
+Assume $|\mathcal{H}|<\infty$, then with probability $1-d$ over the following inequalities holds simultaneously for all $f\in CH(\mathcal{H})$ and all $\theta\in (0,1]$
+\begin{align}
+P_D(yf(x)\leq0)\leq P_S(yf(x)\leq \theta)+O(\frac{1}{\sqrt{n}}(\frac{log(n)log|\mathcal{H}|}{\theta^2}+log\frac{1}{\delta})^{\frac{1}{2}})
+\end{align}
+which means that if for most data the margin is small then this classifier is good.
+\end{thm}
+\begin{proof}
+There are 3 steps:
+
+1. We want to show that $f\in CH(\mathcal{H}), \mathrm{w.h.p.} g\in CH_N(\mathcal{H})$ 
+$$f(x)\approx g(x)$$
+which suffices to prove
+$$
+P_D(yf(x)\leq0)\leq P_D(yg(x)\leq\frac{\theta}{2})+\mathrm{small}
+$$
+2. Then we can show that:
+$$
+P_D(yg(x)\leq\frac{\theta}{2})\leq P_S(yg(x)\leq\frac{\theta}{2})+ \mathrm{Complexity} \,  \mathrm{of} \, CH_N(\mathcal{H})
+$$
+3. 
+$$
+P_S(yg(x)\leq\frac{\theta}{2})\leq P_S(yf(x)\leq\theta)+\mathrm{small}
+$$
+Rob Schapire in Microsoft, 1990, The strength of Weak Learnable. Take the prove in xitike
+\end{proof}
+
+## 3.3 Bagging
+
+\begin{bs}
+Given dataset $D = \{x_1, ..., x_n\}$, draw with replcement, we can get many dadaset with the same sample size. $\{x_1^1, ..., x_n^1\}, \{x_1^2, ..., x_n^2\}, ..., \{x_1^k, ..., x_n^k\}$.
+\end{bs}
+
+
+
+\begin{bag}
+\begin{algorithm}
+\caption{Bagging}  
+\label{Bagging}  
+\begin{algorithmic}
+\REQUIRE Input $S = \{(x_1, y_1), ..., (x_n, y_n)\}$
+\REQUIRE $\mathcal{A}$ a base learning algorithm
+\STATE Bootstrap on the original dataset S and get $S_1, ..., S_k$
+\FOR {$t = 1, 2, ... ,k$}
+\STATE Learn a base classifier $h_t(\cdot)$ using $\mathcal{A}$ on $S_t$
+\ENDFOR 
+\RETURN $F(x) = \frac{1}{k} h_t(x)$
+\end{algorithmic}  
+\end{algorithm}
+\end{bag}
+
+## 3.4 Algorithmic Stability and Generalization
+
+SVM and Boosting try to improve the margin. Now we try to analyse the property of a algorithm and its error. For Boosting: 
+$$
+l = \frac{1}{n}\sum_{i=1}^n \exp(-y_i\sum_{t=1}^T \alpha_t h_t(x))
+$$
+and for SVM: 
+$$
+l=\frac{1}{n}\sum_{i=1}^n \left[1-y_i(w^Tx_i+b)\right]+\frac{\lambda}{2}||w||^2
+$$
+
+Denote $\mathcal{A}$ the learning algorithm. $S=\{(x_i,y_i)\}$ the training data set, $l(\mathcal{A}(S),z)$ the loss function, $\mathcal{A}(S)$ the result of the learning algorithm, $z$ the test data. Then risk function is 
+$$
+R(\mathcal{A}(S))=E_z[l(\mathcal{A}(S),z)]
+$$
+and empirical risk is 
+$$
+R_{\mathrm{emp}}(\mathcal{A}(S))=\frac{1}{n}\sum_{i=1}^n l(\mathcal{A}(S),z_i)
+$$
+
+\begin{definition}
+A learning algorithm $\mathcal{A}$ is said to have \textbf{uniform stability} $\boldsymbol {\beta}$ with respect to loss $l$, if for $\forall S=(z_1,...,z_n), S^i=(z_{-i},z_i')$, 
+$$
+\left|l\left(\mathcal{A}(S),z\right)-l\left(\mathcal{A}(S^i),z\right)\right|\leq\beta
+$$
+\end{definition}
+
+\begin{thm}
+Suppose $\mathcal{A}$ has uniform stability $\beta$ with respect to loss $l$ and $l\leq M$, then with probability $1-\delta$,
+\begin{align}
+R(\mathcal{A}(S))\leq R_{\mathrm{emp}}(\mathcal{A}(S))+\beta+(n\beta+M)\sqrt{\frac{2 \log\frac{1}{\delta}}{n}}
+\end{align}
+\end{thm}
+\begin{proof}
+Denote $f(S) = R(\mathcal{A}(S)) - R_{\mathrm{emp}}(\mathcal{A}(S))$. The theorem is equivalent to 
+$$
+\mathbb{P}[f(S)\geq\beta+\epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+\begin{align*}
+E_{S}[R_{\mathrm{emp}}(\mathcal{A}(S))] &= E_{S} \left[\frac{1}{n}\sum_{i=1}^n l(\mathcal{A}(S),z_i)\right] \\
+&= \frac{1}{n}\sum_{i=1}^n E_{S, z_i'} \left[ l(\mathcal{A}(S^i),z_i')\right]
+\end{align*}
+also, 
+$$
+E_S [R(\mathcal{A}(S))] = E_{S, z_i'} l(\mathcal{A}(S),z_i')
+$$
+By the definition of uniform stability, we know that
+$$
+| l(\mathcal{A}(S),z_i') - l(\mathcal{A}(S^i),z_i') | \leq \beta
+$$
+Therefore,
+$$
+E_S[f(S)] \leq \beta
+$$
+Also,
+\begin{align*}
+|f(S) - f(S^i)| 
+&= |R(\mathcal{A}(S)) - R_{\mathrm{emp}}(\mathcal{A}(S)) - R(\mathcal{A}(S^i)) + R_{\mathrm{emp}}(\mathcal{A}(S^i))| \\
+&\leq |R(\mathcal{A}(S)) - R(\mathcal{A}(S^i))| + \frac{1}{n}\sum_{i=1}^n |l(\mathcal{A}(S),z_i) - l(\mathcal{A}(S^i),z_i)| \\
+&\leq \beta + \frac{n-1}{n} \beta + \frac{2M}{n} \\
+&\leq 2(\beta + \frac{M}{n})
+\end{align*}
+Then, by Mcdiarmid's Lemma, 
+$$
+\mathbb{P}[f(S)\geq E_S[f(S)] + \epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+Therefore, by the fact that $E_S[f(S)] \leq \beta$
+$$
+\mathbb{P}[f(S)\geq\beta+\epsilon]\leq \exp(-\frac{n\epsilon^2}{2(n\beta+M)^2})
+$$
+\end{proof}
+
+\newpage
+
+## 3.5 Online Learning 
+
+\begin{algorithm}
+\caption{Weighted Majority Vote}  
+\label{WMV}  
+\begin{algorithmic}
+\REQUIRE Parameter $\beta \in (0,1)$
+\STATE Initialize weights $w_{1, i} = 1, i \in \{1, ..., N\}$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE Every expert $i \in \{1, ..., N\}$ makes a prediction $\tilde{y}_{t,i}$
+\STATE Majority Vote
+\IF {$\sum_{y_{i,t} = 0} w_{t,i} \leq \sum_{y_{i,t} = 1} w_{t,i}$}
+  \STATE $\tilde{y}_t = 1$
+\ELSE
+  \STATE $\tilde{y}_t = 0$
+\ENDIF
+\STATE Observe the real value $y_t$
+\IF {$\tilde{y}_t = y_t$}
+  \STATE $w_{t+1,i} \leftarrow w_{t,i}$
+\ELSE
+  \STATE $w_{t+1,i} \leftarrow \beta w_{t,i}$ for all $i$ such that $\tilde{y}_{t,i} \neq y_t$
+\ENDIF
+\ENDFOR 
+\end{algorithmic}  
+\end{algorithm}
+
+\begin{thm}
+Let $L_T=\sum_{t=1}^T|\tilde{y}_t-y_t|$, $m_T^{(i)}=\sum_{t=1}^T|\tilde{y}_{t,i}-y_t|$, $m_T^*=\min\limits_{i\in[1...N]}m_T^{(i)}$. Then 
+\begin{align}
+L_T\leq \frac{\ln{\frac{1}{\beta}}}{\ln{\frac{2}{1+\beta}}}m_T^*+\frac{\ln{N}}{\ln{\frac{2}{1+\beta}}}
+\end{align}
+\end{thm}
+\begin{proof}
+\textbf{Potential Function Method}. Denote 
+$$
+W_t:=\sum_{i=1}^Nw_{t,i}
+$$
+Now when $\tilde{y}_t\neq y_t$ (Algorithm makes wrong prediction), 
+$$
+W_{t+1}\leq \left(\frac{1+\beta}{2}\right) W_t
+$$
+Therefore,
+\begin{align}
+\label{eqnc}
+W_T &\leq \left(\frac{1+\beta}{2}\right)^{L_T} N \\
+\label{eqnd}
+\forall i, \; W_T &\geq w_{T,i}=\beta^{m_T^{(i)}} 
+\end{align}
+Combine (\ref{eqnc}) and (\ref{eqnd}) together, we get our conclusion.
+\end{proof}
+
+\begin{algorithm}[H]
+\caption{Randomized Weighted Majority Vote}  
+\label{RWMV}  
+\begin{algorithmic}
+\REQUIRE Parameter $\beta \in (\frac{1}{2},1)$
+\STATE Initialize weights $w_{1, i} = 1, i \in \{1, ..., N\}$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE Every expert $i \in \{1, ..., N\}$ makes a prediction $\tilde{y}_{t,i}$
+\STATE Randomized Majority Vote: sample a prediction according to $p_{t,i} = \frac{w_{t,i}}{\sum_{i=1}^N w_{t,i}}$
+\STATE Observe the real value $y_t$
+\STATE $w_{t+1,i} \leftarrow \beta w_{t,i}$ for all $i$ such that $\tilde{y}_{t,i} \neq y_t$
+\ENDFOR 
+\end{algorithmic}  
+\end{algorithm}
+
+\begin{thm_h}
+For the Randomized Weighted Majority Vote Algorithm, define expected loss: 
+$$
+L_T=\sum_{t=1}^T\sum_{i=1}^N\frac{w_{t,i}}{\sum_{j=1}^Nw_{t,j}}|\tilde{y}_{t,i}-y_t|
+$$
+Then $\forall \beta\in (\frac{1}{2},1)$ we have
+\begin{align}
+L_T\leq(2-\beta)m_T^*+\frac{\ln{N}}{1-\beta}
+\end{align}
+Further, if $T$ is known, let $\beta=1-\sqrt{\frac{\ln{N}}{T}}$, then we have 
+\begin{align}
+L_T\leq m_T^*+2\sqrt{T*\ln{N}}
+\end{align}
+which is usually written as:
+\begin{align}
+\frac{L_T}{T}\leq \frac{m_T^*}{T}+O\left(\sqrt{\frac{\ln{N}}{T}}\right)
+\end{align}
+\end{thm_h}
+
+\begin{proof}
+Define $W_{t} = \sum_{j=1}^N w_{t,j}$. Therefore, $W_1 = N$ and 
+$$
+L_T=\sum_{t=1}^T\sum_{i=1}^N\frac{w_{t,i}}{W_t}|\tilde{y}_{t,i}-y_t|
+$$
+Denote 
+$$
+l_t = \frac{\sum_{\tilde{y}_{t,i} \neq y_t} w_{t,i}}{W_t}
+$$
+Therefore,
+\begin{align*}
+W_{t+1} 
+&= (1 - l_t) W_t + \beta l_t W_t \\
+&= W_t \left(1 - l_t + \beta l_t\right)
+\end{align*}
+And we have
+\begin{align*}
+W_{\mathrm{final}} 
+&= W_1 \prod_{t=1}^t \left(1 - (1 - \beta)l_t\right) \\
+&\leq N \prod_{t=1}^T \exp\left\{- (1 - \beta)l_t\right\} \\
+&= N \exp\left\{- (1 - \beta) \sum_{t=1}^Tl_t\right\}
+\end{align*}
+Note that $\forall i$,
+$$
+W_{\mathrm{final}}  \geq w_{T,i} = \beta^{m_T^{(i)}}
+$$
+Therefore, $W_{\mathrm{final}} \geq \beta^{m_T^*}$
+$$
+N \exp\left\{- (1 - \beta) \sum_{t=1}^Tl_t\right\} \geq \beta^{m_T^*}
+$$
+Therefore,
+$$
+\sum_{t=1}^Tl_t \leq \frac{\ln \frac{1}{\beta}}{1 - \beta}m_T^* + \frac{\ln N}{1 - \beta} 
+$$
+Note that $L_T = \sum_{t=1}^Tl_t$ and when $\beta \in (\frac{1}{2}, 1)$
+$$
+\frac{\ln \frac{1}{\beta}}{1 - \beta} \leq 2 - \beta
+$$
+So we have the conclusion
+$$
+L_T\leq(2-\beta)m_T^*+\frac{\ln{N}}{1-\beta}
+$$
+\end{proof}
+
+\textbf{Note:} for online learning algorithms, $T$ is usually unknown. We instead use doubling trick to solve it: we can guess a $T$ first, then if we want to continue then we double $T$. It is easy to prove that with this trick we can get a similar result.
+
+\begin{VNM}
+\begin{align}
+\min_p\max_q p^TMq=\max_q\min_p p^TMq
+\end{align}
+\end{VNM}
+
+\begin{proof}
+Repeated Game, zero-sum matrix game.
+
+Consider each row an expert, row player combines experts and chooses $p_t$. Consider column player the adversarial, chooses $q_t$. At time $t$, expert $i$ suffers loss $(Mq_t)_i$ and row player loss $p_t^TMq_t$
+
+\end{proof}
+
+\begin{algorithm}[H]
+\caption{Von Neumann Minmax}  
+\label{VNM}  
+\begin{algorithmic}
+\REQUIRE Parameter $\beta \in (\frac{1}{2},1)$
+\STATE Initialize $p_1 = (\frac{1}{N}, ..., \frac{1}{N})$
+\STATE We want to make $q_t = \mathop{\mathrm{argmax}}\limits_q p_t^T Mq$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE 1. Row player chooses $p_t$
+\STATE 2. Column player chooses $q_t$ which may depend on $p_t$
+\STATE 3. Row player observes the loss of each row $(Mq_t)$
+\STATE 4. $p_{t+1}^{(i)} = \frac{p_t^{(i)} \beta (Mq_t)^{(i)}}{z_t}$ where $z_t$ is a normalization factor $s.t.$ $\sum p_{t+1}^{(i)}=1$
+\ENDFOR 
+\end{algorithmic}  
+\end{algorithm}
+
+\begin{thm}
+Assume $M_{ij}\in[0,1]$, then
+\begin{align}
+\sum_{t=1}^Tp_t^TMq_t &\leq(2-\beta)\min_i(\sum_{t=1}^TMq_t)_i+\frac{\ln{N}}{1-\beta} \\
+\frac{1}{T}\sum_{t=1}^Tp_t^TMq_t &\leq\frac{1}{T}\min_i(\sum_{t=1}^TMq_t)_i+O\left(\sqrt{\frac{\ln{N}}{T}}\right)
+\end{align}
+where the left side is $\min\limits_p\max\limits_q p^TMq$ while the one on the right side is another
+\end{thm}
+
+\begin{algorithm}[H]
+\caption{Multiplicative Weight Updating}  
+\label{MWU}  
+\begin{algorithmic}
+\REQUIRE pmf $x=(x(1),...,x(n))$ $x_i\geq0,\sum x_i=1$ where $x$ is unknown to the learner
+\REQUIRE Parameters $\delta$, $\epsilon$
+\STATE Initialize $x_0 = (\frac{1}{N}, ..., \frac{1}{N})$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE Adversary chooses $f_t\in\{0,1\}^N$, calculates $\langle f_t,x\rangle = \sum_{i=1}^N f_t(i) x_i$
+\STATE Adversary releases $f_t$ and $\langle f_t,x\rangle$ to the learner
+\IF {$\langle f_t,x\rangle-\langle f_t,x_t\rangle >\delta$}
+  \IF {$f_t(i)=1$}
+    \STATE ${x_t(i)\leftarrow (1+\epsilon) x_{t-1}(i)}$
+  \ENDIF
+  \STATE Normalize $x_t$
+\ELSIF  {$\langle f_t,x\rangle-\langle f_t,x_t\rangle < -\delta$}
+  \IF {$f_t(i)=0$}
+    \STATE ${x_t(i)\leftarrow (1+\epsilon) x_{t-1}(i)}$
+  \ENDIF
+  \STATE Normalize $x_t$
+\ENDIF
+\ENDFOR 
+\end{algorithmic}  
+\end{algorithm}
+
+\begin{thm_h}
+For every choice of $f_1,f_2,...$ the algorithm goes into these two situations for at most $\frac{2\log{N}}{\epsilon\delta}$ ($0<\epsilon<\delta$)
+\end{thm_h}
+
+\begin{proof}
+Use Kullback–Leibler divergence $D(x \|x_t) = \sum_{i=1}^N x(i)\log \frac{x(i)}{x_t(i)}$ as potential function. Therefore, when $\langle f_t,x\rangle-\langle f_t,x_t\rangle >\delta$
+\begin{align*}
+D(x \|x_{t+1}) 
+&= \sum_{i=1}^N x(i)\log \frac{x(i)}{x_{t+1}(i)} \\
+&= D(x \|x_t) + \sum_{i=1}^N x(i)\log \frac{x_t(i)}{x_{t+1}(i)} \\
+&= D(x \|x_t) + \sum_{f_t(i) = 1} x(i)\log \frac{x_t(i)}{\frac{(1+\epsilon)x_{t}(i)}{1 + \epsilon \langle f_t,x_t\rangle}} \\
+&= D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle) - \langle f_t,x\rangle \log (1+\epsilon) \\
+&\leq D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle)- \left(\langle f_t,x_t\rangle + \delta\right) \log (1+\epsilon) \\
+&\leq D(x \|x_t) - \delta \log (1+\epsilon)
+\end{align*}
+Given the ground truth that
+$$
+(1 + \epsilon)^k \geq 1 + \epsilon k
+$$
+
+Also, when $\langle f_t,x\rangle-\langle f_t,x_t\rangle < -\delta$,
+\begin{align*}
+D(x \|x_{t+1}) 
+&= \sum_{i=1}^N x(i)\log \frac{x(i)}{x_{t+1}(i)} \\
+&= D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle) - \langle f_t,x\rangle \log (1+\epsilon) \\
+&\leq D(x \|x_t) + \log \left[1 + \epsilon (\langle f_t,x\rangle + \delta)\right] - \langle f_t,x\rangle \log (1+\epsilon) \\
+&\leq D(x \|x_t) - \delta \log (1+\epsilon) 
+\end{align*}
+
+Therefore, denote $n_t$ as the update times till time $t$, which is the times that $|\langle f_t,x\rangle - \langle f_t,x_t\rangle| > \delta$ till time $t$. Then,
+\begin{align*}
+0 
+&\leq D(x \|x_{T}) \\
+&\leq D(x \|x_1) - n_T \delta \log (1+\epsilon) \\
+&\leq \log N -   n_T \delta \log (1+\epsilon)
+\end{align*}
+Therefore,
+$$
+n_T \leq \frac{\log N}{\delta \log(1+\epsilon)} \leq \frac{2 \log N}{\epsilon \delta}
+$$
+Given the fact that $0 < \epsilon < \delta < 1$ and $\log(1 + \epsilon) \geq \frac{\epsilon}{2}$ when $\epsilon \in (0,1)$.
+\end{proof}
+
+
+\newpage
+
+# Chapter 4. PAC Learning
+
+## 4.1 Bayesian and Frequentist 
+
+Bayesian: learn a distribution of classifier so it is a stochastic classifier. Then the function of it can be valued by its expectation.
+
+
+\begin{hw}
+Let $Q$ be a distribution of classifiers, stochastic classifier, $\mathrm{error}_D(f_Q)$ and voting classifier, $\mathrm{error}_D(v_Q)$. Find the relationship between these two errors.
+\end{hw}
+
+\begin{proof}
+We know that if $f_v(x)\neq y$, then 
+$$
+\mathbb{P}_Q(f(x)\neq y)>1/2
+$$
+Let $f(x,y)=\mathbb{P}_Q(f(x)\neq y)$, 
+$$
+\mathrm{error}_D(v_Q)=\mathbb{P}_{(x,y)}(f_v(x)\neq y ) = \mathbb{E}_{(x,y)}(I[f(x,y)>\frac{1}{2}])
+$$
+
+also, 
+
+\begin{align*}
+\mathrm{error}_D(f_Q) 
+&=\mathbb{P}_{Q,(x,y)}(f(x)\neq y) \\
+&= \mathbb{E}_{(x,y)}(f(x,y))\\
+&= \frac{1}{2}\mathbb{E}_{(x,y)}(2f(x,y)) \\
+&\geq \frac{1}{2}\mathbb{E}_{(x,y)}(I[f(x,y)>0.5]) \\
+&= \frac{1}{2}\mathrm{error}_D(v_Q)
+\end{align*}
+
+Therefore, 
+$$
+\mathrm{error}_D(f_Q) \geq \frac{1}{2}\mathrm{error}_D(v_Q)
+$$
+\end{proof}
+
+As VC theory is some kind of Frequentist theory, so now by the view of Bayesion we want a uniform convergence, but it is a stochastic classifier, we should uniform all the distribution of the stochastic classifiers. For fixed prior distribution $\mathcal{P}$ (w.h.p over random draw of training data) for all distribution $\mathcal{Q}$. Recall that for VC-theory or Margin-theory we want to get:
+\begin{center}
+For all classifier $f\in\mathcal{H}$ , $\mathrm{err}_D(f)\leq \mathrm{err}_S(f)+\mathrm{Complexity}$
+\end{center}
+So for this case it should be:
+\begin{center}
+For all distribution $Q$ , $\mathrm{err}_D(Q)\leq \mathrm{err}_S(Q)+D(Q||P)$
+\end{center}
+
+## 4.2 PAC Bayes Theorem
+
+For any fixed prior distribution$\mathcal{P}$, with probability $1-\delta$, we have
+\begin{align}
+\mathrm{err}_D(Q)\leq \mathrm{err}_S(Q)+\sqrt{\frac{D(Q||P)+\log(\frac{3}{\delta})}{n}}
+\end{align}
+Holds for all $\alpha$ simultaneously.
+
+\begin{lemma_h}
+For any functional $f$ of classifier $\hbar$
+\begin{align}
+E_{\hbar\sim Q}[f(\hbar)]\leq \ln E_{\hbar\sim P}[e^{f(\hbar)}]+D(Q||P)
+\end{align}
+\end{lemma_h}
+\begin{proof}
+\begin{align*}
+E_{\hbar\sim Q}[f(\hbar)]
+&= E_{\hbar\sim Q}[\ln e^{f(\hbar)}] \\
+&= E_{\hbar\sim Q}\left[\ln \frac{d P(x)}{d Q(x)}e^{f(\hbar)} + \ln \frac{d Q(x)}{d P(x)}\right] \\
+&= E_{\hbar\sim Q}\left[\ln \frac{d P(x)}{d Q(x)}e^{f(\hbar)}\right] + D(Q \| P) \\
+&\leq \ln E_{\hbar\sim Q}\left[\frac{d P(x)}{d Q(x)}e^{f(\hbar)}\right] + D(Q \| P) \\
+&= \ln E_{\hbar\sim P}[e^{f(\hbar)}]+D(Q||P)
+\end{align*}
+\end{proof}
+
+\begin{lemma_h}
+Let $f(\hbar)=n[\mathrm{err}_D(\hbar) - \mathrm{err}_S(\hbar)]^2$. Then 
+\begin{align}
+\mathbb{P}\left[\mathbb{E}_{\hbar\sim P}\exp\{f(\hbar)\}\geq\frac{3}{\delta}\right]\leq\delta
+\end{align}
+Prove that for all fixed $\hbar$, 
+\begin{align}
+\mathbb{P}\left(\left|\mathrm{err}_D(\hbar)-\mathrm{err}_S(\hbar)\right|\geq\epsilon\right)\leq 2e^{-2n\epsilon^2}
+\end{align}
+\end{lemma_h}
+
+\begin{proof}
+According to chernoff bound, 
+$$
+\mathbb{P}\left[|\mathrm{err}_D(h)-\mathrm{err}_S(h)|\geq \epsilon\right]\leq 2 e^{-2n\epsilon^2}
+$$
+Therefore, 
+$$
+\mathbb{P}[e^{f(h)}\geq t]=\mathbb{P}\left[|\mathrm{err}_D(h)-\mathrm{err}_S(h)|\geq \sqrt{\frac{\ln t}{n}}\right]\leq \frac{2}{t^2}
+$$
+\begin{align*}
+\therefore 
+E_{h\sim P}\exp\{f(h)\} 
+&=\int_0^{+\infty}\mathbb{P}[e^{f(h)}\geq t]dt \\
+&\leq \int_0^1 1dt+\int_1^{+\infty}\frac{2}{t^2}dt \\
+&=3
+\end{align*}
+By Markov's inequality, the result holds.
+\end{proof}
+
+\begin{lemma}
+Improved PAC Bayes Thm:
+\begin{align}
+\mathbb{P}\left(D_B(\mathrm{err}_S(Q)||\mathrm{err}_D(Q))\geq\delta\right)\geq\frac{D(Q||P)+\log\frac{n+1}{\delta}}{n}
+\end{align}
+\end{lemma}
+
+## 4.3 PAC-Bayes implies Margin theory for SVM
+
+We have a distribution $Q$ and it derives a voting classifier and a stochastic classifier, but the error of the first one cannot exceed the 2-times of the second one. Because if the voting classifier is wrong then the stochastic is only half right.
+
+Assume the linear classifier goes from the origin (because we can add 1 more dimension to make it), then the unit normal vector of the classifier is uniformly distributed on the surface of unit ball centering at origin, this is our prior distribution.
+
+But it is hard to calculate so we use $P\sim\mathcal{N}(0,I)$ instead.???
+
+Gaussian distribution for posteriors distribution is easy to calculate the KL-distance, thus we suppose $Q\sim\mathcal{N}(\mu,I)$. Actually $Q\sim\mathcal{N}(u*\overrightarrow{w},I)$, where $u\in\mathcal{R}$.
+
+
+\begin{thm}
+Assume $Q\sim\mathcal{N}(u*\overrightarrow{w},I)$, where $u\in\mathcal{R}$, then
+\begin{align}
+\mathrm{err}_D(Q)\leq \mathrm{err}_S(Q)+\sqrt{\frac{D(Q||P)+\log\frac{3}{\delta}}{n}}
+\end{align}
+\end{thm}
+\begin{proof}
+First we have:
+$$
+D(Q||P)=D(\mathcal{N}(u*\overrightarrow{w},I)||\mathcal{N}(0,I))=\frac{u^2}{2}
+$$
+Here only 1-dimension is needed to integral and all others are equivalent.
+
+Now consider $\mathrm{err}_S(Q)$ where $Q\sim\mathcal{N}(u*\overrightarrow{w},I)$. For any given $(x,y)$ the probability for wrong classified is:
+$$
+\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty}e^{-t^2}dt
+$$ 
+where $t=u*y*\frac{w*x}{||x||}$. So we have: 
+$$
+\mathrm{err}_S(Q)=\frac{1}{n}\sum\Phi(u*y_i*\frac{w*x_i}{||x_i||})
+$$ 
+where $\Phi(t)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty}e^{-\frac{t^2}{2}}dt$. Then when $u\rightarrow 0$ obviously the margin is small.
+\end{proof}
+
+\newpage
+
+# Chapter 5. Other Algorithms
+
+## 5.1 K-Clustering
+
+**Criterion for k-cluster**, learn $c = (c_1,...c_k)$ (cluster center) according to data $x_1,...,x_n\in R^d$ and $x_i\xrightarrow{\mathrm{nearest}} c_{j(i)}$. Objective: 
+$$
+\min\limits_{c_1,...,c_k} \sum_{i=1}^n||x_i-c_{j(i)}||^2
+$$
+
+\begin{algorithm}[H]
+\caption{K-Means}  
+\label{KM}  
+\begin{algorithmic}
+\REQUIRE $k$, the number of different centroids
+\STATE Initialize $k$ different centroids $c = \left\{c_1, ..., c_k\right\}$ to $k$ data points
+\WHILE{some conditions} 
+\STATE Assign each training example to cluster, with centroid $c_j$
+\STATE Each centroid $c_j$ is updated to the mean of all training examples $x_i$ assigned to cluster $j$
+\ENDWHILE
+\end{algorithmic}  
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{K-Means ++}  
+\label{KMPP}  
+\begin{algorithmic}
+\REQUIRE $k$, the number of different centroids
+\STATE Initialize $k$ different centroids $c = \left\{c_1, ..., c_k\right\}$ to $k$ data points
+\WHILE{some conditions}
+\STATE 1. $\phi_{\mathrm{OPT}} = \sum_{i=1}^N ||x_i-c_{j(i)}||^2$
+\STATE 2. $\phi_{\mathrm{K-Means++}} = ???$ s.t. $E[\phi_{\mathrm{K-Means++}}]\leq 8\left(\log{k}+2\right)\phi_{\mathrm{OPT}}$
+\STATE 3. $c_i \sim \frac{D(x)^2}{\sum_{x}D(x)^2}$ where $D(x)=||x-C(x)||$ and $C(x)=\arg\min{||x-c_j||^2,j<i}$
+\ENDWHILE
+\end{algorithmic}  
+\end{algorithm}
+
+## 5.2 Reinforcement Learning
+
+\begin{definition}
+\textbf{Markov Decision Process} S(State), P(Probability), A(Action), R(Reward). But actually it should be written as $P_{S,A}^S$, $R_{S,A}$ or Transition prob $P(S_{t+1}|S_t,a_t)$ and Reward $R_{t+1}=E[R(S_t,a_t)]$
+\end{definition}
+Our goal is to maximize long-term reward.  At every time $t$ reward, $\gamma\in(0,1]$, then 
+$$
+\max G_t:=R_{t+1}+\gamma R_{t+2}+...
+$$
+Policy $S\mapsto a$ and $\pi:S\mapsto A$, Given policy $\pi$, value function 
+$$
+v_\pi(s)=E[R_{t+1}+\gamma R_{t+1}+...]
+$$
+Action value function
+$$
+q_\pi(s,a):=E[R_{t+1}+\gamma R_{t+2}+...|S_t=s,A_t=a]
+$$ 
+At time $t$, take action a, then follow $\pi$ at time $t+1$ and so on.
+
+\begin{definition}
+\textbf{Bellman Equation}, Given policy $\pi$, 
+$$
+v_\pi(s)=R(s,\pi(s))+\gamma\sum_{s'}P\left(s'|s,\pi(s)\right)v_\pi(s')
+$$ 
+then by vector and matrix it is 
+$$
+v_\pi=R^{(\pi)}+\gamma P^{(\pi)}v_\pi
+$$
+Now denote 
+$$
+\phi_\pi(v):=R^{(\pi)}+\gamma P^{(\pi)}v
+$$ 
+which is called \textbf{Bellman Expectation Operator}.
+\end{definition}
+
+\begin{thm}
+For $\gamma\in(0,1)$, define 
+$$
+d(v,v')=\max\limits_{s\in S}|v(s)-v'(s)|
+$$ 
+then Bellman Expectation Operator is a Contraction mapping. So by iteration we can simply calculate $v_\pi(s)$ by Bellman Operator. Also,
+$$
+q_\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'|s,a)+q_\pi(s',\pi(s'))
+$$ 
+so it is an evaluation for policy $\pi$
+\end{thm}
+
+\newpage
+
+# Appendix A. Term Project
+
+\begin{ter}
+Denote Data space = $[\mathcal{N}]$, $\mathcal{F}\subseteq\{0,1\}^{\mathcal{N}}$, VC dmension $VC(\mathcal{F})=d$ if $\exists i_1,...,i_d$, $\mathcal{F}$'s projection onto $i_1,...,i_d$ contains $\{0,1\}^d$ and $\forall i_1,...,i_{d+1}$'s projection onto $i_1,...,i_{d+1} \neq \{0,1\}^{d+1}$ 
+
+$f\in \mathcal{F}$, $\exists X_f\subseteq X$, $f|_{X_f}\neq f'|_{X_f}, \forall f'\in \mathcal{F}$
+
+Teaching dimension of f is $TD(f,\mathcal{F})=\min|X_f|$, best case teaching dimension is $TD_{\min}(\mathcal{F})=\min_{f\in \mathcal{F}}TD(f,\mathcal{F})$.
+
+Let $\mathcal{F}_0=\mathcal{F}$ and assume $f_1, s.t. TD_{\min}(\mathcal{F})=TD(f_1,\mathcal{F})$, $\mathcal{F}_1=\mathcal{F}_0\backslash\{f_1\}$ and so on.
+
+Define Recursive Teaching Dimension: $RTD(\mathcal{F}) = max_tTD_{min}(\mathcal{F}_t)$, then $RTD(\mathcal{F})=O(VC(\mathcal{F})^2)$
+\end{ter}
+
+\begin{ter}
+Fundamental background: Neural network in our brain is not too deep and calculation efficiency is far better, and is highlight distributed instead of central control system. So I want to compare human brain with computer, although we may reach the complexity of brain but our efficiency and control system is still not comparative to brain. So there are some advance system or algorithm in brain we can explore.
+\\\\We have many concepts in our mind, whether concrete or abstract, and how these concepts performs is still a mystery. Then how to put concepts into our algorithm is an interesting question. Now deep learning performs well because it is quite the same way human brain used to deal with imagines. But to go further we need to explore concepts.(Les Valiant, The Circuit of the Mind).Concepts are connected, and can be classified into deep concepts and surface concepts and so on.
+\\\\Hinton, Capsule. Reference papers:
+\\$\textcircled{1}$ Dynamic Routing Between Capsules. NIPS'17.
+\\$\textcircled{2}$ Matrix Capsules with EM Routing, ICLR'18 submission.
+\\\\Our work is to assume that concepts is formed by the connection by neural networks, and then explore how to put concepts into our algorithm. But our methods are not limited on these two papers, so we can design new algorithms for learning network with capsules. Furthermore there work are focused on simple training data, so we can find experimental results at bench mark datasets.
+\end{ter}
+
+\begin{ter}
+By hardware human brain is far stronger than any computer but now or in the near future the size will be comparable, at least the speed of computer is faster. At the same time the performance of our computer is far below the human brain performance. So may be human brain is not work by concurrent algorithm but by a global control system and worked like distributed computation, so we should explore it.
+
+1. Decoupled Neural Interfaces using Synthetic Gradients
+
+2. Understanding Synthetic Gradient and Decoupled Neural Interfaces.
+\end{ter}
+
+\newpage
+
+# Appendix B. Reading List
+
+## Chapter 3 Reading List
+
+- [Schapire, R. E. (1990). The strength of weak learnability. Machine learning, 5(2), 197-227](https://link.springer.com/content/pdf/10.1023%2FA%3A1022648800760.pdf)
+
+- [Schapire, R. E., Freund, Y., Bartlett, P., & Lee, W. S. (1998). Boosting the margin: A new explanation for the effectiveness of voting methods. The annals of statistics, 26(5), 1651-1686](https://projecteuclid.org/download/pdf_1/euclid.aos/1024691352)
+
+- [Schapire, R. E., & Singer, Y. (1999). Improved boosting algorithms using confidence-rated predictions. Machine learning, 37(3), 297-336](https://link.springer.com/content/pdf/10.1023%2FA%3A1007614523901.pdf)
+
+- [Bousquet, O., & Elisseeff, A. (2002). Stability and generalization. Journal of Machine Learning Research, 2(Mar), 499-526](http://www.jmlr.org/papers/volume2/bousquet02a/bousquet02a.pdf)
+
+- [Littlestone, N., & Warmuth, M. K. (1994). The weighted majority algorithm. Information and computation, 108(2), 212-261](https://ac.els-cdn.com/S0890540184710091/1-s2.0-S0890540184710091-main.pdf?_tid=a3707172-d5c1-11e7-b3de-00000aab0f27&acdnat=1512041510_318f069783ce624b158e4f5b6fb6cfa5)
+
+- [Arora, S., Hazan, E., & Kale, S. (2012). The Multiplicative Weights Update Method: a Meta-Algorithm and Applications. Theory of Computing, 8(1), 121-164](https://pdfs.semanticscholar.org/d8d1/825942b7a7defc4a3666757f4ab1f19e18c7.pdf)
+
+## Chapter 4 Reading List
+
+- [McAllester, D. (2003). Simplified PAC-Bayesian margin bounds. Lecture notes in computer science, 203-215](https://link.springer.com/content/pdf/10.1007/b12006.pdf#page=218)
+
+## Term Project 1 Reading List
+
+- [Doliwa, T., Fan, G., Simon, H. U., & Zilles, S. (2014). Recursive teaching dimension, VC-dimension and sample compression. Journal of Machine Learning Research, 15(1), 3107-3131](http://www.jmlr.org/papers/volume15/doliwa14a/doliwa14a.pdf)
+
+- [Simon, H. U., & Zilles, S. (2015, June). Open problem: Recursive teaching dimension versus VC dimension. In Conference on Learning Theory (pp. 1770-1772)](http://proceedings.mlr.press/v40/Simon15b.pdf)
+
+- [Chen, X., Cheng, Y., & Tang, B. (2016). On the recursive teaching dimension of vc classes. In Advances in Neural Information Processing Systems (pp. 2164-2171)](http://papers.nips.cc/paper/6412-on-the-recursive-teaching-dimension-of-vc-classes.pdf)
+
+- [Hu, L., Wu, R., Li, T., & Wang, L. (2017). Quadratic Upper Bound for Recursive Teaching Dimension of Finite VC Classes. arXiv preprint arXiv:1702.05677](https://arxiv.org/pdf/1702.05677.pdf)
+
+## Term Project 2 Reading List
+
+- [Sabour, S., Frosst, N., & Hinton, G. E. (2017). Dynamic Routing Between Capsules. arXiv preprint arXiv:1710.09829](https://arxiv.org/pdf/1710.09829.pdf)
+
+- [Matrix Capsules with Em Routing](https://openreview.net/pdf?id=HJWLfGWRb)
+
+\newpage
+
+# Appendix C. Deep Learning Reading List
+
+## a. Generalization/Understanding
+
+- [Mou, W., Wang, L., Zhai, X., & Zheng, K. (2017). Generalization Bounds of SGLD for Non-convex Learning: Two Theoretical Viewpoints. arXiv preprint arXiv:1707.05947](https://arxiv.org/pdf/1707.05947.pdf)
+
+- [Telgarsky, M. (2016). Benefits of depth in neural networks. arXiv preprint arXiv:1602.04485](http://proceedings.mlr.press/v49/telgarsky16.pdf)
+
+- [Montufar, G. F., Pascanu, R., Cho, K., & Bengio, Y. (2014). On the number of linear regions of deep neural networks. In Advances in neural information processing systems (pp. 2924-2932)](http://papers.nips.cc/paper/5422-on-the-number-of-linear-regions-of-deep-neural-networks.pdf)
+
+- [Eldan, R., & Shamir, O. (2016, June). The power of depth for feedforward neural networks. In Conference on Learning Theory (pp. 907-940)](http://proceedings.mlr.press/v49/eldan16.pdf)
+
+- [Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I., & Fergus, R. (2013). Intriguing properties of neural networks. arXiv preprint arXiv:1312.6199](https://arxiv.org/pdf/1312.6199)
+
+- [Hardt, M., Recht, B., & Singer, Y. (2015). Train faster, generalize better: Stability of stochastic gradient descent. arXiv preprint arXiv:1509.01240](https://arxiv.org/pdf/1509.01240)
+
+- [Koh, P. W., & Liang, P. (2017). Understanding black-box predictions via influence functions. arXiv preprint arXiv:1703.04730](https://arxiv.org/pdf/1703.04730)
+
+- [Zhang, C., Bengio, S., Hardt, M., Recht, B., & Vinyals, O. (2016). Understanding deep learning requires rethinking generalization. arXiv preprint arXiv:1611.03530](https://arxiv.org/pdf/1611.03530)
+
+- [Yosinski, J., Clune, J., Bengio, Y., & Lipson, H. (2014). How transferable are features in deep neural networks?. In Advances in neural information processing systems (pp. 3320-3328)](http://papers.nips.cc/paper/5347-how-transferable-are-features-in-deep-neural-networks.pdf)
+
+- [Goodfellow, I. J., Shlens, J., & Szegedy, C. (2014). Explaining and harnessing adversarial examples. arXiv preprint arXiv:1412.6572](https://arxiv.org/pdf/1412.6572)
+
+## b. Computer Vision(CNN)
+
+- [Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. In Advances in neural information processing systems (pp. 1097-1105)](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)
+
+- [Simonyan, K., & Zisserman, A. (2014). Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556](https://arxiv.org/pdf/1409.1556.pdf)
+
+- [Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., ... & Rabinovich, A. (2015). Going deeper with convolutions. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1-9)](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf)
+
+- [Hinton, G., Vinyals, O., & Dean, J. (2015). Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531](https://arxiv.org/pdf/1503.02531)
+
+- [He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770-778)](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)
+
+## c. Training Techniques
+
+- [Kingma, D., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980](https://arxiv.org/pdf/1412.6980)
+
+- [Ioffe, S., & Szegedy, C. (2015, June). Batch normalization: Accelerating deep network training by reducing internal covariate shift. In International Conference on Machine Learning (pp. 448-456)](http://proceedings.mlr.press/v37/ioffe15.pdf)
+
+- [Srivastava, N., Hinton, G. E., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. Journal of machine learning research, 15(1), 1929-1958](http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf?utm_content=buffer79b43&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer)
+
+- [Hinton, G. E., Srivastava, N., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. R. (2012). Improving neural networks by preventing co-adaptation of feature detectors. arXiv preprint arXiv:1207.0580](https://arxiv.org/pdf/1207.0580)
+
+- [Goodfellow, I. J., Warde-Farley, D., Mirza, M., Courville, A., & Bengio, Y. (2013). Maxout networks. arXiv preprint arXiv:1302.4389](http://proceedings.mlr.press/v28/goodfellow13.pdf)
+
+## d. Reinforcement Learning
+
+- [Van Hasselt, H., Guez, A., & Silver, D. (2016, February). Deep Reinforcement Learning with Double Q-Learning. In AAAI (pp. 2094-2100)](http://www.aaai.org/ocs/index.php/AAAI/AAAI16/paper/download/12389/11847)
+
+- [Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., ... & Dieleman, S. (2016). Mastering the game of Go with deep neural networks and tree search. Nature, 529(7587), 484-489](http://ai.arizona.edu/sites/ai/files/resources/mastering_the_game_of_go_with_deep_neural_networks_and_tree_search.pdf)
+
+- [Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., ... & Petersen, S. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529-533](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
+
+## e. Generative Models
+
+- [Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., ... & Bengio, Y. (2014). Generative adversarial nets. In Advances in neural information processing systems (pp. 2672-2680).](http://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf)
+
+- [Salimans, T., Goodfellow, I., Zaremba, W., Cheung, V., Radford, A., & Chen, X. (2016). Improved techniques for training gans. In Advances in Neural Information Processing Systems (pp. 2234-2242)](http://papers.nips.cc/paper/6125-improved-techniques-for-training-gans.pdf)
+
+- [Arjovsky, M., & Bottou, L. (2017). Towards principled methods for training generative adversarial networks. arXiv preprint arXiv:1701.04862](https://arxiv.org/pdf/1701.04862)
+
+- [Arjovsky, M., Chintala, S., & Bottou, L. (2017). Wasserstein gan. arXiv preprint arXiv:1701.07875](https://arxiv.org/pdf/1701.07875)
+
+- [Kingma, D. P., & Welling, M. (2013). Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114](https://arxiv.org/pdf/1312.6114.pdf)
+
+## f. Natural Language Process(RNN)
+
+- [Zheng, S., Jayasumana, S., Romera-Paredes, B., Vineet, V., Su, Z., Du, D., ... & Torr, P. H. (2015). Conditional random fields as recurrent neural networks. In Proceedings of the IEEE International Conference on Computer Vision (pp. 1529-1537)](https://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Zheng_Conditional_Random_Fields_ICCV_2015_paper.pdf)
+
+- [Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781](https://arxiv.org/pdf/1301.3781)
+
+- [Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in neural information processing systems (pp. 3104-3112)](http://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf)
+
+- [Hermann, K. M., Kocisky, T., Grefenstette, E., Espeholt, L., Kay, W., Suleyman, M., & Blunsom, P. (2015). Teaching machines to read and comprehend. In Advances in Neural Information Processing Systems (pp. 1693-1701)](http://papers.nips.cc/paper/5945-teaching-machines-to-read-and-comprehend.pdf)
+
+- [Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780](https://www.google.co.jp/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&ved=0ahUKEwj5mcnm0dbXAhWIu7wKHXIoDv4QFghPMAM&url=https%3A%2F%2Fwww.researchgate.net%2Fpublication%2F13853244_Long_Short-term_Memory&usg=AOvVaw25tAj5rT_skJOJMckgK2HR)

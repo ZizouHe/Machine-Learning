@@ -1,0 +1,24 @@
+---
+title: "Machine Learning Homework 3"
+author: "He Li, 2014012684"
+date: "2017/10/25"
+output: pdf_document
+---
+
+\newtheorem{pb}{Problem}
+
+\begin{pb}
+Prove the following inequality: $\sum_{k=0}^d C_n^k \leq (\frac{en}{d})^d$
+\end{pb}
+
+\begin{proof}
+\begin{align*}
+\sum_{k=0}^d C_n^k 
+&= \sum_{k=0}^d \frac{n...(n-k+1)}{k!} \\
+&\leq \sum_{k=0}^d \frac{n^k}{k!} \\
+&= \sum_{k=0}^d \frac{d^k}{k!} \frac{n^k}{d^k} \\
+&\leq \left(\frac{n}{d}\right)^d \;\sum_{k=0}^d \frac{d^k}{k!} \\
+&\leq \left(\frac{n}{d}\right)^d \;\sum_{k=0}^{+\infty} \frac{d^k}{k!} \\
+&= \left(\frac{ne}{d}\right)^d
+\end{align*}
+\end{proof}

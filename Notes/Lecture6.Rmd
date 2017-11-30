@@ -1,0 +1,203 @@
+---
+title: "Lecture 6"
+author: "He Li 2014012684"
+date: "2017/10/31"
+header-includes:
+   - \usepackage{algorithm}
+   - \usepackage{algorithmic}
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newtheorem*{definition}{Definition} 
+\newtheorem*{ssvm}{Soft-margin SVM}
+\newtheorem*{hl}{Hinge Loss}
+\newtheorem*{kt}{Kernel Trick}
+\newtheorem*{ab}{AdaBoost}
+\newtheorem*{Proposition}{Proposition}
+\newtheorem*{ph}{Proposition(Homework)}
+\newtheorem*{note}{Note}
+\newtheorem*{bs}{Bootstrap}
+\newtheorem*{bag}{Bagging}
+
+## 1. Supported Vector Machine Continued
+
+\begin{ssvm} How to find a linear classifier when the data set is not seperable? The soft-margin SVM can be defined as:
+\begin{align*}
+&\min_{w,b,\xi_i} \frac{1}{2} \|\omega\|^2 + C \sum_i \xi_i \\
+&s.t. \quad
+\begin{cases}
+y_i(\omega^Tx_i + b) \geq 1 - \xi_i \\
+\xi_i \geq 0
+\end{cases}
+\end{align*}
+The soft-margin SVM can be rewritten as
+\begin{align*}
+&\max_{\lambda_i} \sum_i \lambda_i - \frac{1}{2} \sum_{i,j} \lambda_i\lambda_j y_i y_j (x^T_i x_j) \\
+&s.t. \quad
+\begin{cases}
+0 leq \lambda_i \leq C \\
+\sum\limits_i \lambda_i y_i = 0 \\
+\end{cases}
+\end{align*}
+\end{ssvm}
+
+\vspace{12pt}
+
+\begin{hl}
+The above sotf-margin SVM can also be rewritten as a optimization problem without constraint. Using hinge loss, the above problem is as same as:
+$$
+\min_{\omega, b} \frac{1}{2} \| \omega\|^2 + C \sum_i \left[1 - y_i (\omega^T x_i +b)\right]_+
+$$
+where 
+$$
+x_+ = \;
+\begin{cases}
+0 \quad x \leq 0 \\
+x \quad x > 0
+\end{cases}
+$$
+\end{hl}
+
+\vspace{12pt}
+
+Here we use hinge loss as a surrogate loss of 0-1 loss, which has the following two good properties:
+
+- hinge loss is the upper bound of 0-1 loss.
+- hinge loss is computationally efficient.
+- although hinge loss is not differentiable everywhere, it is convex.
+
+Sometimes we want to do some mapping on the original space.
+\begin{align*}
+&\max_{\lambda_i} \sum_i \lambda_i - \frac{1}{2} \sum_{i,j} \lambda_i\lambda_j y_i y_j (\phi(x_i)^T \phi(x_j)) \\
+&s.t. \quad
+\begin{cases}
+0 leq \lambda_i \leq C \\
+\sum\limits_i \lambda_i y_i = 0 \\
+\end{cases}
+\end{align*}
+
+where $x = (x^{(1), ..., x^{(d)}})$, and for example
+$$
+x : \mapsto \phi(x) = (x^{(1)}, ..., x^{(d)}, [x^{(1)}]^2, [x^{(1)}x^{(2)}], ..., [x^{(d)}]^2)
+$$
+However, sometimes we cannot have a explicit form of $\phi(\cdot)$. We have **kernel trick**.
+
+\begin{kt}
+We define a binary function $K(\cdot, \cdot)$,
+$$
+K(x_i, x_j) = \phi(x_i) \cdot \phi(x_j)
+$$
+For example, Gaussian Kernel is
+$$
+K(x, x') = \exp\left\{-\frac{\|x - x'\|^2}{2\sigma^2}\right\}
+$$
+\end{kt}
+
+Reproducing kernel Hilbert space**???**
+
+## 2. Boosting(Meta Learning)
+
+**Idea Combine base classifier**
+
+1. generate
+2. combine
+
+\vspace{12pt}
+
+\begin{ab}
+\begin{algorithm}
+\caption{AdaBoost}  
+\label{AdaBoost}  
+\begin{algorithmic}
+\REQUIRE Input $S = \{(x_1, y_1), ..., (x_n, y_n)\}$, $y_i \in \{\pm 1\}$
+\REQUIRE $\mathcal{A}$ a base learning algorithm
+\STATE Initialize $D_1(i) = \frac{1}{n}, \; i \in \{1, ..., n\}$
+\FOR {$t = 1, 2, ... ,T$}
+\STATE Learn a base classifier $h_t(\cdot)$ using $\mathcal{A}$ with $D_t(\cdot)$ on S
+\STATE $\epsilon_t := \sum_{i=1}^n D_t(i) I[y_i \neq h_t(x_i)]$
+\STATE $\gamma_t := 1 - 2 \epsilon_t$
+\STATE $\alpha_t := \frac{1}{2} \ln \frac{1 - \gamma_t}{1 + \gamma_t}$
+\STATE $z_t := \sum_i  D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}$
+\STATE $D_{t+1}(i) = \frac{D_t(i) \exp\left\{- y_i \alpha_t h_t(x_i)\right\}}{z_t}$
+\ENDFOR 
+\RETURN $F(x) = \mathrm{sgn} \left[\sum_{t=1}^T \alpha_t h_t(x)\right]$
+\end{algorithmic}  
+\end{algorithm}
+\end{ab}
+
+\vspace{12pt}
+
+\begin{ph}
+AdaBoost is a greedy exponential loss with the following two properties: 
+\begin{align}
+\alpha_t &= \arg\min_\alpha \sum_{i=1}^n D_t(i) \exp\{-y_i\alpha_t (x_i)\} \\
+\prod_{t=1}^T z_t &= \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_i \sum_{t=1}^T \alpha_t h_t(x_i)\right\} = \frac{1}{n} \sum_i \exp\left\{-y_i f(x_i)\right\}
+\end{align}
+\end{ph}
+
+\vspace{12pt}
+
+**Note** that $\exp\{-y_i f(x_i)\}$ is also a surrogate loss of 0-1 loss, differentiable as well as convex.
+
+\vspace{12pt}
+
+\begin{ph}
+Suppose $\gamma_t \geq \gamma \geq 0$ for $t \in [1, ... ,T]$. Then
+\begin{align*}
+P_s\left(yf(x) \leq 0\right) &= \frac{1}{n} I\left[y_i f(x_i) \leq 0\right] \\
+&\leq \frac{1}{n} \sum_{i=1}^n \exp\left\{-y_if(x_i) \leq 0\right\} \\
+&\leq (1 - \gamma^2)^{\frac{T}{2}}
+\end{align*}
+\end{ph}
+
+\vspace{12pt}
+
+\begin{ph}
+Calculate the following function
+$$
+\frac{1}{n} D_{t+1}(i) I[y_i \neq h_t(x_i)] 
+$$
+\end{ph}
+
+\vspace{12pt}
+
+Note that
+\begin{align*}
+f(x) &= \sum_{t=1}^T \alpha_t h_t(x) \\
+\tilde{f}(x) &= \frac{\sum_{t=1}^T \alpha_t h_t(x)}{\sum_{t=1}^T \alpha_t}
+\end{align*}
+which is a convex combination of $h_t(x)$ and $y\tilde{f}(x) \in [-1,1]$. We can see this as a margin. In SVM margin represents Euclidean distance yet here margin denotes confidence. **???**
+
+## 3. Bagging(Bootstrap aggregating)
+
+\begin{bs}
+Given dataset $D = \{x_1, ..., x_n\}$, draw with replcement, we can get many dadaset with the same sample size. $\{x_1^1, ..., x_n^1\}, \{x_1^2, ..., x_n^2\}, ..., \{x_1^k, ..., x_n^k\}$.
+\end{bs}
+
+\vspace{12pt}
+
+\begin{bag}
+\begin{algorithm}
+\caption{Bagging}  
+\label{Bagging}  
+\begin{algorithmic}
+\REQUIRE Input $S = \{(x_1, y_1), ..., (x_n, y_n)\}$
+\REQUIRE $\mathcal{A}$ a base learning algorithm
+\STATE Bootstrap on the original dataset S and get $S_1, ..., S_k$
+\FOR {$t = 1, 2, ... ,k$}
+\STATE Learn a base classifier $h_t(\cdot)$ using $\mathcal{A}$ on $S_t$
+\ENDFOR 
+\RETURN $F(x) = \frac{1}{k} h_t(x)$
+\end{algorithmic}  
+\end{algorithm}
+\end{bag}
+
+

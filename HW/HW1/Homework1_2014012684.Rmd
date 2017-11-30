@@ -1,0 +1,121 @@
+---
+title: "Machine Learning Homework 1"
+author: "He Li, 2014012684"
+date: "2017/10/9"
+output: pdf_document
+---
+
+### 1. *R.V.* $x \sim \mathcal{N} (0,1)$. Define function $\Phi(u) = P(x \geq u)$. Find elementary function $f$, $g$ s.t. $g(u) \leq \Phi(u) \leq f(u)$ when $u \rightarrow \pm \infty$.
+
+*proof*
+
+First, we calculate $\Phi(u)$:
+
+\begin{align*}
+\Phi(u) 
+&= P(x \geq u) \\
+&= \int_u^{+\infty} \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}} \mathrm{dx} \\
+&= \frac{1}{\sqrt{2\pi} u} e^{-\frac{u^2}{2}} - \int_u^{+\infty} \frac{1}{\sqrt{2 \pi} x^2}e^{-\frac{x^2}{2}} \mathrm{dx}
+\end{align*}
+
+$\Phi(u)$ has some good properties: monofonically increasing on $(-\infty, + \infty)$.
+
+Let $f(u) = \frac{1}{\sqrt{2\pi} u} e^{-\frac{u^2}{2}}$ when $u \rightarrow + \infty$, obviously, $f(u) \geq \Phi(u)$ and 
+\begin{align*}
+\lim_{u \rightarrow + \infty} \frac{f(u)}{\Phi(u)} 
+&= \lim_{u \rightarrow + \infty} \frac{f'(u)}{- \phi(u)} \\
+&= \lim_{u \rightarrow + \infty} 1 + \frac{1}{u^2} = 1
+\end{align*}
+and $\frac{f(u)}{\Phi(u)}$ is always $\geq 1$.
+
+Let $g(u) = \frac{1}{\sqrt{2\pi} (u+e^{-u})} e^{-\frac{u^2}{2}}$ when $u \rightarrow + \infty$, obviously, $g(u) \leq \Phi(u)$ since
+\begin{align*}
+\lim_{u \rightarrow + \infty} \frac{g(u)}{\Phi(u)} 
+&= \lim_{u \rightarrow + \infty} \frac{g'(u)}{- \phi(u)} \\
+&= \lim_{u \rightarrow + \infty} \frac{u(u+e^{-u}) + 1 - e^{-u}}{u (u + e^{-u})^2} = 1
+\end{align*}
+and $\frac{g(u)}{\Phi(u)}$ is always $\leq 1$.
+
+When $u \rightarrow - \infty$, it is similar. $F(u) = 1 - g(-u)$, $G(u) = 1 - f(-u)$.
+
+Therefore, when $u \rightarrow + \infty$,
+$$
+\frac{1}{\sqrt{2\pi} (u+e^{-u})} e^{-\frac{u^2}{2}} \leq \Phi(u) \leq  \frac{1}{\sqrt{2\pi }u} e^{-\frac{u^2}{2}}
+$$
+
+when $u \rightarrow - \infty$,
+$$
+1 + \frac{1}{\sqrt{2\pi} u} e^{-\frac{u^2}{2}} \leq \Phi(u) \leq 1 - \frac{1}{\sqrt{2\pi} (e^{u} - u)} e^{-\frac{u^2}{2}}
+$$
+
+\begin{flushright}$\Box$\end{flushright}
+
+### 2. Given *R.V.* x, $x_1, ..., x_n$ is Bernoulli, $\mathbb{E}(x) = p$.Then, $\forall \delta > 0$, $P(\frac{1}{n} \sum_{i = 1}^n x_i - p \geq \delta) = ?$
+
+*proof*
+
+Let $\tilde{x} = \sum_{i = 1}^n x_i$, 
+$$
+M_{\tilde{x}}(t) = (1 - p + p e^t)^n
+$$
+Therefore,
+$$
+P\left\{\tilde{x} \geq n(p + \delta)\right\} \leq \inf_{t >0} e^{-tn(p + \delta)} (1 - p + p e^t)^n
+$$
+Minimize $e^{-tn(p + \delta)} (1 - p + p e^t)^n$, which is to miminize $F(t) = -t(p + \delta)+ ln(1 - p + pe^t)$. 
+$$
+F'(t) = \frac{pe^t}{1 - p + pe^t} - p - \delta = 0
+$$
+Therefore, $t = ln\left(\frac{(p + \delta)(1 - p)}{p(1 - p - \delta)}\right)$.
+Therefore, 
+$$
+P\left\{\tilde{x} \geq n(p + \delta)\right\} \leq \mathrm{exp}\{-n D_B(p + \delta \| p)\}
+$$
+
+Further, we want to prove that
+$$
+\mathrm{exp}\{-n D_B(p + \delta \| p)\} \leq e^{-2n \delta^2}
+$$
+Denote $f(\delta) = D_B(p + \delta \| p) - 2\delta^2$, $f(0) = 0$. 
+\begin{align*}
+f'(\delta) &= \mathrm{ln}(\frac{p+\sigma}{p}) - \mathrm{ln}(\frac{1 - p - \delta}{1 - p}) - 4\delta \\
+f''(\delta) &= \frac{2}{(p + \delta)(1 - p - \delta)} - 4
+\end{align*}
+
+Therefore, $f'(0) = 0$ and $f''(\delta) \geq 0$ if $\delta \geq 0$. Therefore, 
+$$
+f(\delta) \leq f(0) = 0
+$$
+Therefore,
+$$
+\mathrm{exp}\{-n D_B(p + \delta \| p)\} \leq e^{-2n \delta^2}
+$$
+
+\begin{flushright}$\Box$\end{flushright}
+
+### 3. Prove Hoeffding Inequality: $x_1 ... x_n$ independent, $x_i \in [a_i, b_i]$, $\mathbb{E}(x_i) = \mu_i$. $$P\left(\frac{1}{n} \sum_{i = 1}^n x_i - \frac{1}{n} \sum_{i = 1}^n \mu_i \geq \epsilon\right) \leq \mathrm{exp}\{\frac{-2n^2\epsilon^2}{\sum_{i = 1}^n (a_i - b_i)^2}\}$$
+
+*proof*
+
+We first prove $\mathbb{E}[e^{t(x - \mu)}] \leq \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}$.
+
+From Jenson's inequility, $\mathbb{E}[e^{t(x - \mu)}]$ is maximized when $x$ is distributed on boundary of domain, which makes $x$ a Bernoulli distribution. Assume $P(x = b) = p$, 
+\begin{align*}
+\mathbb{E}[e^{t(x - \mu)}] &= p e^{t(b - \mu)} + (1 - p) e^{t(a - \mu)} \\
+F(x) &= \mathbb{E}[e^{t(x - \mu)}] - \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}
+\end{align*}
+with some calculation, we can find that $\mathrm{max} \; F(x) \leq 0$. Therefore, $\mathbb{E}[e^{t(x - \mu)}] \leq \mathrm{exp}\{\frac{1}{8}t^2(b-a)^2\}$.
+
+Then,
+
+\begin{align*}
+P\left(\frac{1}{n} \sum_{i = 1}^n x_i - \frac{1}{n} \sum_{i = 1}^n \mu_i \geq \epsilon\right) 
+&= P\left(\sum_{i = 1}^n x_i -  \sum_{i = 1}^n \mu_i \geq n\epsilon\right) \\ 
+&\leq \inf_{t > 0} e^{-tn\epsilon} \mathbb{E}[e^{t(\sum_{i = 1}^n x_i -  \sum_{i = 1}^n \mu_i)}] \\
+&\leq \inf_{t > 0} e^{-tn\epsilon} \prod_{i = 1}^n \mathbb{E}[e^{t(x_i - \mu_i)}] \\ 
+&\leq \inf_{t > 0} \mathrm{exp}\{-tn\epsilon + \frac{1}{8} t^2 \sum_{i = 1}^n (b_i - a_i)^2\} \\
+&\leq \mathrm{exp}\{\frac{-2n^2\epsilon^2}{\sum_{i = 1}^n (a_i - b_i)^2}\}
+\end{align*}
+
+\begin{flushright}$\Box$\end{flushright}
+
