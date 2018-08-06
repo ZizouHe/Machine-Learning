@@ -3,6 +3,7 @@ title: "Machine Learning Course Notes"
 author: "He Li, Ziheng Huang, Zehua Lai"
 date: "2017 Fall"
 header-includes:
+   - \usepackage{amsthm}
    - \usepackage{algorithm}
    - \usepackage{algorithmic}
 output: 
@@ -69,6 +70,7 @@ knitr::opts_chunk$set(echo = TRUE)
 \newtheorem*{bs}{Bootstrap}
 \newtheorem*{bag}{Bagging}
 \newtheorem*{VNM}{Von Neumann Minmax Theorem}
+\newtheorem*{value_iter}{Value Iteration}
 \newpage
 
 # Chapter 0. Preliminary
@@ -608,6 +610,15 @@ For $\mathcal{H} = \mathcal{H}_1 \cup \mathcal{H}_2$, the union of $\mathcal{H}_
 &= |\mathcal{H}|
 \end{align*}
 \end{proof}
+
+With Sauer's Lemma, we know that set $\mathcal{H}$ can at least shatter $|\mathcal{H}|$ sets in $\mathcal{N}$. Therefore, if
+$$
+|\mathcal{H}| > \sum_{i=0}^{k-1} \binom{n}{i}
+$$
+Then $\mathcal{H}$ can at least shatter one set with cardinality of $k$. In other words, if the VCD of $\mathcal{H}$ is $k$, then
+$$
+|\mathcal{H}| \leq \sum_{i=0}^{k} \binom{n}{i}
+$$
 
 
 \begin{cor}
@@ -1672,7 +1683,7 @@ Action value function
 $$
 q_\pi(s,a):=E[R_{t+1}+\gamma R_{t+2}+...|S_t=s,A_t=a]
 $$ 
-At time $t$, take action a, then follow $\pi$ at time $t+1$ and so on.
+At time $t$, take action a, then follow the original action $\pi$ after time $t+1$.
 
 \begin{definition}
 \textbf{Bellman Equation}, Given policy $\pi$, 
@@ -1697,10 +1708,68 @@ d(v,v')=\max\limits_{s\in S}|v(s)-v'(s)|
 $$ 
 then Bellman Expectation Operator is a Contraction mapping. So by iteration we can simply calculate $v_\pi(s)$ by Bellman Operator. Also,
 $$
-q_\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'|s,a)+q_\pi(s',\pi(s'))
+q_\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'|s,a)v_\pi(s',\pi(s'))
 $$ 
-so it is an evaluation for policy $\pi$
+so it is an evaluation for policy $\pi$.
 \end{thm}
+
+We would like to find a policy $\pi^*$, such that $v_{\pi^*}(s)\geq v_{\pi}(s), \forall \pi, s$, or $v_{\pi^*} \succ v_{\pi}$ . From now on, assume $R(s,a)$ is bounded.
+
+\begin{value_iter}
+$$
+v'(s)=\max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v(s')]
+$$
+\end{value_iter}
+
+\begin{hw}
+Prove that 
+$$
+\phi :R^{|S|}\to R^{|S|}, \forall s\in S, \phi(v(s)) = v'(s)
+$$ 
+is a contraction mapping with respect to $l_{\infty}$-norm (but its value might not be a value of any policy). It is called the Bellman Optimality Operator.
+\end{hw}
+
+\begin{proof}
+We would like to show that Bellman Operator is a $\gamma$ contraction mapping with respect to $l_{\infty}$-norm. 
+\begin{align*}
+\left|\phi(v'(s)) - \phi(v(s))\right| 
+&= \left|\max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v'(s')] - \max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v(s')]\right|\\
+&\leq \left|R(s,a)+\gamma\sum_{s'} P(s'|s,a)v'(s') - R(s,a)+\gamma\sum_{s'} P(s'|s,a)v(s')\right| \\
+&= \gamma \left| \sum_{s'} P(s'|s,a) \left[v'(s') - v(s') \right]\right| \\
+&\leq \gamma \max_{s'} \left|v'(s') - v(s') \right| \sum_{s'} P(s'|s,a) \\
+&= \gamma \max_{s'} \left|v'(s') - v(s')\right| \\
+&= \gamma \|v' - v\|_{\infty}
+\end{align*}
+
+Therefore,
+$$
+\|\phi(v') - \phi(v)\|_{\infty} \leq \gamma \|v' - v\|_{\infty}
+$$
+where $\gamma \in [0,1)$. Thus, $\phi(\cdot)$ is a contraction mapping with respect to $l_{\infty}$-norm.
+
+\end{proof}
+
+\begin{hw}
+Show that 
+$$
+v_{\pi'}(s)\geq v_{\pi}(s)
+$$
+\end{hw}
+
+\begin{proof}
+\begin{align*}
+v_{\pi'}(s) 
+&= \max_{a}\left[R(s,a)+\gamma\sum P(s'|s,a)v(s')\right] \\
+&\geq R(s,\pi(s))+\gamma\sum P(s'|s,\pi(s))v(s') \\
+&= v_{\pi}(s)
+\end{align*}
+\end{proof}
+
+The fixed point for $\phi(v_{\pi})$ must be the value function of a policy $\pi^*$.
+
+It is clear that $\phi(v_{\pi})\geq v_{\pi}$. And if $v, v'\in R^{|S|}$(not necessarily a value function), $v\succ v'$, then $\phi(v)\succ \phi(v')$. Thus, $\phi^{(n+1)}(v_{\pi})\geq \phi^{(n)}(v_{\pi})$. So the policy $\pi^*$ is indeed the optimal policy.
+
+In reinforce learning, this algorithm is called the value iteration. Another algorithm is called the policy iteration. For a initial policy $\pi_0$. $\pi_{n+1}(s)=\arg \max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v_\pi(s')]$. $v_\pi(s)$ can be evaluated by using Bellman expectation operator. 
 
 \newpage
 
@@ -1772,6 +1841,14 @@ By hardware human brain is far stronger than any computer but now or in the near
 - [Sabour, S., Frosst, N., & Hinton, G. E. (2017). Dynamic Routing Between Capsules. arXiv preprint arXiv:1710.09829](https://arxiv.org/pdf/1710.09829.pdf)
 
 - [Matrix Capsules with Em Routing](https://openreview.net/pdf?id=HJWLfGWRb)
+
+## Term Project 3 Reading List
+
+- [Jaderberg, M., Czarnecki, W. M., Osindero, S., Vinyals, O., Graves, A., & Kavukcuoglu, K. (2016). Decoupled neural interfaces using synthetic gradients. arXiv preprint arXiv:1608.05343](https://arxiv.org/pdf/1608.05343.pdf)
+
+- [Czarnecki, W. M., Świrszcz, G., Jaderberg, M., Osindero, S., Vinyals, O., & Kavukcuoglu, K. (2017). Understanding Synthetic Gradients and Decoupled Neural Interfaces. arXiv preprint arXiv:1703.00522](https://arxiv.org/pdf/1703.00522.pdf)
+
+- [Zheng, S., Meng, Q., Wang, T., Chen, W., Yu, N., Ma, Z. M., & Liu, T. Y. (2017, July). Asynchronous Stochastic Gradient Descent with Delay Compensation. In International Conference on Machine Learning (pp. 4120-4129)](http://proceedings.mlr.press/v70/zheng17b/zheng17b.pdf)
 
 \newpage
 

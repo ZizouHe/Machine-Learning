@@ -1,0 +1,136 @@
+\documentclass[twoside,11pt]{article}
+
+% Any additional packages needed should be included after jmlr2e.
+% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
+% and defines many common macros, such as 'proof' and 'example'.
+%
+% It also sets the bibliographystyle to plainnat; for more information on
+% natbib citation styles, see the natbib documentation, a copy of which
+% is archived at http://www.jmlr.org/format/natbib.pdf
+
+\usepackage{jmlr2e}
+
+% Definitions of handy macros can go here
+
+\newcommand{\dataset}{{\cal D}}
+\newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
+
+% Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
+
+
+% Short headings should be running head and authors last names
+
+\firstpageno{1}
+
+\begin{document}
+
+\title{Recursive Teaching Dimension Versus VC Dimension}
+
+\author{\name Zehua Lai\\
+       \addr 2014012668
+       \AND
+       \name Ziheng Huang\\
+       \addr 2014012678
+       \AND
+       \name He Li\\
+       \addr 2014012684}
+
+\maketitle
+
+\begin{abstract}
+In this work we study the quantitative relation between the recursive teaching dimension
+(RTD) and the VC dimension (VCD) of concept classes of finite sizes. The RTD of a concept
+class is a combinatorial complexity measure characterized
+by the worst-case number of examples necessary to identify a concept according
+to the recursive teaching model. An open problem is whether any
+linear function of the VCD of a finite concept class gives an upper bound on the recursive teaching
+dimension \citep{Zilles2013Models} of that class. In this article, we will review related works in this topic and discuss about the challenges in fully solving the open problem.
+\end{abstract}
+
+\section{Introduction}
+
+Sample complexity is one of the central concepts in machine learning. It is
+the amount of data needed to achieve a desired learning accuracy. For example, in PAC-learning, sample complexity is characterized
+by the VC dimension (VCD) of the concept class \citep{Vapnik1971On}. PAC-learning is a passive learning model. In this model, the role of the teacher is limited
+to providing labels to data randomly drawn from the underlying distribution. Different from PAC-learning, there are important models in which teacher involves more actively
+in the learning process. For example, in the classical teaching model \citep{goldman1995complexity}, the teacher chooses a set of labeled examples so that the learner,
+after receiving the examples, can distinguish the target concept from all other concepts in the
+concept class. In this model, the key complexity measure of a concept class is the teaching dimension,
+which is defined as the worst-case number of examples needed to be selected by the teacher.
+
+One of the most important questions in computational learning theory is how such information
+complexity parameters relate to each other. As \citet{simon2015open} posed, an open problem is: is the RTD upper-bounded by a function that grows only linearly in the VCD?
+
+\section{Definitions and Notation}
+
+$X$ denotes a finite set¡£ Sometimes, for brevity, we let $ X = [n] := \{1,2,...,n\}$. A concept $C$ is a subset of $X$. $\mathcal{C}$ denotes a concept class over $X$, which is a subset of $2^{|X|}$. For $X' \subseteq X$, we define $\mathcal{C}_{|X'} := \{C \cap X' | C\in \mathcal{C}\}$. We treat concepts interchangeably
+as subsets of $X$ and as 0,1-valued functions on $X$. A labeled example is a pair $(x,l)$ with
+$x \in X$ and $l \in \{0, 1\}$. A labeled example $(x,l)$ is consistent with a concept $C$ if $\chi(x \in C) = l$. If $S$ is a set of labeled examples, we define $X(S) = \{x\in X|(x,*) \in S\}$.
+
+$A \subseteq X$ is said to be shattered by $\mathcal{C}$ if $\mathcal{C}_{|A} = 2^{|A|}$. VCD($\mathcal{C}$) denotes the VC-dimension of a concept class $\mathcal{C}$, which is the maximum size of a shattered subset of $X$.
+
+A teaching set for a concept $C \in \mathcal{C}$ is a set $S$ of labeled examples such that $C$, but no
+other concept in $\mathcal{C}$, is consistent with $S$. Let $\mathcal{TS}(C;\mathcal{C})$ denote the family of teaching sets for
+$C \in \mathcal{C}$, let ${TS}(C;\mathcal{C})$ denote the size of the smallest teaching set for $C \in \mathcal{C}$.
+
+\begin{definition}[\citealt{Zilles2013Models}] A teaching plan $P$ for $\mathcal{C}$ is a sequence $((C_1,S_1),...,(C_N,S_N))$, such that $\mathcal{C}=\{C_1,...,C_n\}$ and $\forall t = 1,2,...,N$, $S_t \in \mathcal{TS}(C_t;\{C_t,...,C_N\})$. The quantity ord($P$) $:= max_{t=1,...,N} |S_t|$ is called the order of the teaching plan $P$. Finally, we define recursive teaching dimension RTD($\mathcal{C}$) $:= min\{ord(P) |$ P is a teaching plan for $\mathcal{C}$\}.
+\end{definition}
+
+It is clear that RTD$(\mathcal{C})$ is monotonic. If $\mathcal{C}' \subseteq \mathcal{C}$, RTD$(\mathcal{C'})\leq$ RTD$(\mathcal{C})$. We have several propositions which can be used as equivalent definitions for recursive teaching dimension.
+
+\begin{proposition}
+$P$ is called a canonical teaching plan for $\mathcal{C}$, if for any $i, j \in \{1,...,N\}$, $i < j$, we have $TS(C_i;\{C_i,...,C_N\})\leq TS(C_j;\{C_i,...,C_N\})$. For a canonical teaching plan $P^*$, RTD$(\mathcal{C})$ $= ord(P^*)$.
+\end{proposition}
+\begin{proof}
+For a canonical teaching plan $P^*$, it is clear that RTD($\mathcal{C}$) $\leq ord(P^*)$. We need to prove RTD($\mathcal{C}$) $\geq ord(P^*)$. Let $P^* = ((C_1,S_1),...,(C_N,S_N))$, and another teaching plan $P = ((C_1',S_1'),...,(C_N',S_N'))$. Choose the minimal $j$ such that $|S_j|=TS(C_j;\{C_j,...,C_N\})=ord(P^*)$. Choose the minimal $i$ such that $C_i' \in \{C_j,...,C_N\}$. So, $C_i'=C_k$ for some $k$. By the definition of canonical teaching plan, $TS(C_k;\{C_j,...,C_N\})\geq TS(C_j;\{C_j,...,C_N\})\geq ord(P^*)$. $ord(P)\geq TS(C_i';\{C_i',...,C_N'\}) \geq TS(C_k;\{C_j,...,C_N\}) \geq ord(P^*)$ hence finish the proof.
+\end{proof}
+\begin{proposition}
+Let $TS_{min}(\mathcal{C}) := min_{C \in \mathcal{C}} TS(C;\mathcal{C})$. Then RTD$(\mathcal{C})= max_{\mathcal{C}' \subseteq \mathcal{C}} TS_{min}(\mathcal{C}')$
+\end{proposition}
+\begin{proof}
+For a canonical teaching plan $P$, we have $TS_{min}(\mathcal{C}) = TS(C_1;\mathcal{C})$. It follows that RTD$(\mathcal{C})$ $ = max \{TS(C_1; \mathcal{C})$, RTD$(\mathcal{C} \backslash C_1)\}$ $ = max \{TS_{min}(\mathcal{C})$, RTD$(\mathcal{C}\backslash C_1)\}$. RTD$(\mathcal{C})$ $\leq max_{\mathcal{C}' \subseteq \mathcal{C}} TS_{min}(\mathcal{C}')$ follows inductively. As for the reverse direction, let $\mathcal{C}' \subseteq \mathcal{C}$ be the maximizer of $TS_{min}$. We have RTD$(\mathcal{C})\geq$ RTD$(\mathcal{C'})\geq TS_{min}(\mathcal{C}')= max_{\mathcal{C}' \subseteq \mathcal{C}} TS_{min}(\mathcal{C}')$
+\end{proof}
+
+The open problem under consideration is that whether RTD can be linear bounded by VCD.
+
+\section{RTD for Special Classes}
+The following families of concept classes $\mathcal{C}$ are known to have recursive teaching dimension of size equal or smaller than VCD($\mathcal{C}$).
+
+\begin{definition} A concept class $\mathcal{C}$ of VC-dimension $d$ over $X$ of cardinality $n$ is called maximum classes if $\mathcal{C}$ achieved the Sauer's bound\citep{Sauer1972On}, $|\mathcal{C}|=\sum _{i=0}^d C^i_n$.
+\end{definition}
+
+\begin{definition} A concept class $\mathcal{C}$ is called intersection-closed if the intersection of any two concepts from $\mathcal{C}$ is itself a concept
+in $\mathcal{C}$ as well.
+\end{definition}
+
+\begin{definition} Let $\mathcal{F}$ be a vector space of real-valued functions over some domain $X$ and $h : X \to R$. For every $f \in \mathcal{F}$, let $C_f(x)=1$ if $h(x)+f(x) > 0$, else $C_f(x)=0$. Then $D_{\mathcal{F},h} = \{C_f|f\in \mathcal{F}\}$ is called a Dudley class. The VC-dimension of $D_{\mathcal{F},h}$ is
+equal to the dimension of the vector space $\mathcal{F}$.
+\end{definition}
+
+In \citet{Darnstdt2016Order}, it has been proved that
+
+\begin{theorem} For a concept class $\mathcal{C}$, if it is a maximum class, intersection-closed class or of VC-dimension 1, then RTD($\mathcal{C}$) = VCD($\mathcal{C}$). If it is a Dudley class, then RTD($\mathcal{C}$) $\leq$ VCD($\mathcal{C}$).
+\end{theorem}
+
+Above result involved explicit construction of a teaching plan or some compression schemes. However, for general concept classes, a explicit construction may be hard to find. For the Dudley class case, \citet{Ben1998Combinatorial} prove that Dudley classes of dimension $k$ are embeddable in maximum classes of VC-dimension $k$. It is not known to date whether every concept class C of VC-dimension $d$ can be embedded into a maximum concept class of VC-dimension $O(d)$. Indeed, finding such an embedding is considered as a promising method for solving the open problem. \citet{liu2016teaching} also analysed some special settings and gave the teaching dimension for ridge regression, support vector machines, and logistic regression.
+
+Another worth noting approach for analysing teaching complexity is the algebraic method. \citet{samei2014algebraic} used algebraic method to proved several important propositions of RTD and VCD, including the Sauer's bound for RTD and the properties of VCD and RTD-maximum class. Considering the consistency of this method in proving the Sauer's bound for both RTD and VCD, it is a promising method to find more connections between the two complexity concepts.
+
+\section{Quadratic Upper Bound of RTD}
+
+In the paper of \citet{chen2016recursive}, they proved the first bound for RTD of general concept class. Let $f(d)=max_{\mathcal{C}:VCD(\mathcal{C})\leq d}TS_{min}(\mathcal{C})$. They used the method in \citet{kuhlmann1999teaching} and \citet{moran2015compressing} to prove that $f(d)\leq 2^d(d-1)+1 + f(d-1)$ and $f(d)\leq 2^{d+1}(d-2)+d+4$ by induction.
+
+\citet{hu2017quadratic} generalized this method to analysed $(x,y)$-class. A concept class $\mathcal{C}$ is an $(x,y)$-class if for any $A\subseteq X$, $|A|\leq x$, we have $|\mathcal{C}_{|A}|\leq y$. Following theorem can be proved:
+
+\begin{theorem} For any positive integer $x$, $y$, $z$ such that $y \leq 2x-1$ and $z\leq 2y+1$, the following inequality holds:
+$$
+f(x+1,z)\leq f(x,y)+\left\lceil \frac{(y+1)(x-1)+1}{2y-z+2}\right\rceil
+$$
+\end{theorem}
+
+Noting that when $x = d-1, y=2^{d-1}-1, z=2^d-1$, the inequality coincides with $f(d)\leq 2^d(d-1)+1 + f(d-1)$, so it is a generalization of the latter inequality. The essential finding is the following: for a concept class with VC-dimension $d$, it it not only a $(d+1,2^{d+1}-1)$-class, but also a $(n,\sum _{i=0}^d C^i_n)$-class. Furthermore, to optimize the induction steps from $f(1,1)$ to $f(x,y)$, we can show that a exponential growth is the best choice by simple calculation. $f(x,\lfloor a^x \rfloor)$ where $a=1.71757$ and $x=4.71607d$ will give us the quadratic bound. In fact, the exponential bound in \citet{chen2016recursive}'s method has not really been improved, we just found a clever way to ignore it. We may still need a new combinatorial technic to fully solve the problem.
+
+\vskip 0.2in
+\bibliography{samplebib}
+
+\end{document}

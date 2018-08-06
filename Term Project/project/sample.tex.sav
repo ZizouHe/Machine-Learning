@@ -1,0 +1,84 @@
+\documentclass[twoside,11pt]{article}
+
+% Any additional packages needed should be included after jmlr2e.
+% Note that jmlr2e.sty includes epsfig, amssymb, natbib and graphicx,
+% and defines many common macros, such as 'proof' and 'example'.
+%
+% It also sets the bibliographystyle to plainnat; for more information on
+% natbib citation styles, see the natbib documentation, a copy of which
+% is archived at http://www.jmlr.org/format/natbib.pdf
+
+\usepackage{jmlr2e}
+
+% Definitions of handy macros can go here
+
+\newcommand{\dataset}{{\cal D}}
+\newcommand{\fracpartial}[2]{\frac{\partial #1}{\partial  #2}}
+
+% Heading arguments are {volume}{year}{pages}{date submitted}{date published}{paper id}{author-full-names}
+
+
+% Short headings should be running head and authors last names
+
+\firstpageno{1}
+
+\begin{document}
+
+\title{Learning with Mixtures of Trees}
+
+\author{\name Marina Meil\u{a} \email mmp@stat.washington.edu \\
+       \addr Department of Statistics\\
+       University of Washington\\
+       Seattle, WA 98195-4322, USA
+       \AND
+       \name Michael I.\ Jordan \email jordan@cs.berkeley.edu \\
+       \addr Division of Computer Science and Department of Statistics\\
+       University of California\\
+       Berkeley, CA 94720-1776, USA}
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{keywords}
+
+\end{keywords}
+
+\section{Introduction}
+
+Sample complexity is one of the central concepts in machine learning. It is
+the amount of data needed to achieve a desired learning accuracy. For example, in PAC-learning, sample complexity is characterized
+by the VC dimension (VCD) of the concept class \citep{Vapnik1971On}. PAC-learning is a passive learning model. In this model, the role of the teacher is limited
+to providing labels to data randomly drawn from the underlying distribution. Different from PAC-learning, there are important models in which teacher involves more actively
+in the learning process. For example, in the classical teaching model \citep{Goldman1995On}, the teacher chooses a set of labeled examples so that the learner,
+after receiving the examples, can distinguish the target concept from all other concepts in the
+concept class. In this model, the key complexity measure of a concept class is the teaching dimension,
+which is defined as the worst-case number of examples needed to be selected by the teacher.
+
+One of the most important questions in computational learning theory is how such information
+complexity parameters relate to each other. An open problem is whether any
+linear function of the VCD of a finite concept class gives an upper bound on the recursive teaching
+dimension \citep{Zilles2013Models} of that class.
+
+In this article, we will review related works in this topic and discuss about the challenges in fully solving the open problem.
+
+\section{Definitions and Notation}
+
+$X$ denotes a finite set and for brevity, we let $ X = [n] := \{1,2,...,n\}$ throughout this paper. A concept $C$ is a subset of $X$. $\mathcal{C}$ denotes a concept class over $X$, which is a subset of $2^{|X|}$. For $X' \subseteq X$, we define $\mathcal{C}_{|X'} := \{C \cap X' | C\in \mathcal{C}\}$. We treat concepts interchangeably
+as subsets of $X$ and as 0,1-valued functions on $X$. A labeled example is a pair $(x,l)$ with
+$x \in X$ and $l \in \{0, 1\}$. A labeled example $(x,l)$ is consistent with a concept $C$ if $\chi(x \in C) = l$. If $S$ is a set of labeled examples, we define $X(S) = \{x\in X|(x,*) \in S\}$.
+
+$A \subseteq X$ is said to be shattered by $\mathcal{C}$ if $\mathcal{C}_{|A} = 2^{|A|}$. VCD($\mathcal{C}$) denotes the VC-dimension of a concept class $\mathcal{C}$, which is the maximum size of a shattered subset of $X$.
+
+A teaching set for a concept $C \in \mathcal{C}$ is a set $S$ of labeled examples such that $C$, but no
+other concept in $\mathcal{C}$, is consistent with $S$. Let $\mathcal{TS}(C;\mathcal{C})$ denote the family of teaching sets for
+$C \in \mathcal{C}$, let ${TS}(C;\mathcal{C})$ denote the size of the smallest teaching set for $C \in \mathcal{C}$.
+
+\begin{definition}[\citealt{Zilles2013Models}] A teaching plan for $\mathcal{C}$ is a sequence $((C_1,S_1),...,(C_N,S_N))$, such that $\mathcal{C}=\{C_1,...,C_n\}$ and $\forall t = 1,2,...,N$, $S_t \in \mathcal{TS}(C_t;\{C_t,...,C_N\})$. The quantity ord($P$) $:= max_{t=1,...,N} |S_t|$ is called the order of the teaching plan P. Finally, we define RTD($\mathcal{C}$) $:= min\{ord(P) |$ P is a teaching plan for $\mathcal{C}$\}.
+
+\end{definition}
+
+\vskip 0.2in
+\bibliography{samplebib}
+
+\end{document}

@@ -1,0 +1,60 @@
+@article{Doliwa2014Recursive,
+  title={Recursive teaching dimension, VC-dimension and sample compression},
+  author={Doliwa, Thorsten and Fan, Gaojian and Simon, Hans Ulrich and Zilles, Sandra},
+  journal={Journal of Machine Learning Research},
+  volume={15},
+  number={1},
+  pages={3107-3131},
+  year={2014},
+}
+
+@article{Vapnik1971On,
+  title={On the Uniform Convergence of Relative Frequencies of Events to Their Probabilities},
+  author={Vapnik, V. N. and Chervonenkis, A. Ya.},
+  journal={Theory of Probability and Its Applications},
+  volume={17},
+  number={2},
+  pages={264-280},
+  year={1971},
+}
+
+@article{goldman1995complexity,
+  title={On the complexity of teaching},
+  author={Goldman, Sally A and Kearns, Michael J},
+  journal={Journal of Computer and System Sciences},
+  volume={50},
+  number={1},
+  pages={20--31},
+  year={1995},
+  publisher={Elsevier}
+}
+
+@article{Zilles2013Models,
+  title={Models of Cooperative Teaching and Learning},
+  author={Zilles, Sandra and Lange, Steffen and Holte, Robert and Zinkevich, Martin},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  number={12},
+  pages={349-384},
+  year={2013},
+}
+
+@article{Darnstdt2016Order,
+  title={Order compression schemes},
+  author={Darnstdt, Malte and Kiss, Thorsten and Simon, Hans Ulrich and Zilles, Sandra},
+  journal={Theoretical Computer Science},
+  volume={620},
+  number={C},
+  pages={73-90},
+  year={2016},
+}
+
+@article{Sauer1972On,
+  title={On the density of families of sets},
+  author={Sauer, N.},
+  journal={Journal of Combinatorial Theory},
+  volume={13},
+  number={1},
+  pages={145-147},
+  year={1972},
+}

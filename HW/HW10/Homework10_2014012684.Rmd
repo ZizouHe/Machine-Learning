@@ -1,0 +1,57 @@
+---
+title: "Machine Learning Homework 9"
+author: "He Li, 2014012684"
+date: "2017/12/13"
+output: pdf_document
+---
+
+
+
+\newtheorem{pro}{Problem}
+
+\begin{pro}
+Prove that 
+$$
+\phi :R^{|S|}\to R^{|S|}, \forall s\in S, \phi(v(s)) = v'(s)
+$$ 
+is a contraction mapping with respect to $l_{\infty}$-norm
+\end{pro}
+
+\begin{proof}
+We would like to show that Bellman Operator is a $\gamma$ contraction mapping with respect to $l_{\infty}$-norm. 
+\begin{align*}
+\left|\phi(v'(s)) - \phi(v(s))\right| 
+&= \left|\max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v'(s')] - \max_{a}[R(s,a)+\gamma\sum P(s'|s,a)v(s')]\right|\\
+&\leq \left|R(s,a)+\gamma\sum_{s'} P(s'|s,a)v'(s') - R(s,a)+\gamma\sum_{s'} P(s'|s,a)v(s')\right| \\
+&= \gamma \left| \sum_{s'} P(s'|s,a) \left[v'(s') - v(s') \right]\right| \\
+&\leq \gamma \max_{s'} \left|v'(s') - v(s') \right| \sum_{s'} P(s'|s,a) \\
+&= \gamma \max_{s'} \left|v'(s') - v(s')\right| \\
+&= \gamma \|v' - v\|_{\infty}
+\end{align*}
+
+Therefore,
+$$
+\|\phi(v') - \phi(v)\|_{\infty} \leq \gamma \|v' - v\|_{\infty}
+$$
+where $\gamma \in [0,1)$. Thus, $\phi(\cdot)$ is a contraction mapping with respect to $l_{\infty}$-norm.
+
+\end{proof}
+
+\begin{pro}
+Show that 
+$$
+v_{\pi'}(s)\geq v_{\pi}(s)
+$$
+\end{pro}
+
+\begin{proof}
+\begin{align*}
+v_{\pi'}(s) 
+&= \max_{a}\left[R(s,a)+\gamma\sum P(s'|s,a)v(s')\right] \\
+&\geq R(s,\pi(s))+\gamma\sum P(s'|s,\pi(s))v(s') \\
+&= v_{\pi}(s)
+\end{align*}
+\end{proof}
+
+
+

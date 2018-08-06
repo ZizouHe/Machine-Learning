@@ -78,12 +78,8 @@ D(x \|x_{t+1})
 &= D(x \|x_t) + \sum_{f_t(i) = 1} x(i)\log \frac{x_t(i)}{\frac{(1+\epsilon)x_{t}(i)}{1 + \epsilon \langle f_t,x_t\rangle}} \\
 &= D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle) - \langle f_t,x\rangle \log (1+\epsilon) \\
 &\leq D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle)- \left(\langle f_t,x_t\rangle + \delta\right) \log (1+\epsilon) \\
-&\leq D(x \|x_t) - \delta \log (1+\epsilon)
+&\leq D(x \|x_t) - \frac{\delta \epsilon}{2}
 \end{align*}
-Given the ground truth that
-$$
-(1 + \epsilon)^k \geq 1 + \epsilon k
-$$
 
 Also, when $\langle f_t,x\rangle-\langle f_t,x_t\rangle < -\delta$,
 \begin{align*}
@@ -91,21 +87,20 @@ D(x \|x_{t+1})
 &= \sum_{i=1}^N x(i)\log \frac{x(i)}{x_{t+1}(i)} \\
 &= D(x \|x_t) + \log (1 + \epsilon \langle f_t,x_t\rangle) - \langle f_t,x\rangle \log (1+\epsilon) \\
 &\leq D(x \|x_t) + \log \left[1 + \epsilon (\langle f_t,x\rangle + \delta)\right] - \langle f_t,x\rangle \log (1+\epsilon) \\
-&\leq D(x \|x_t) - \delta \log (1+\epsilon) 
+&\leq D(x \|x_t) - \frac{\delta \epsilon}{2}
 \end{align*}
 
 Therefore, denote $n_t$ as the update times till time $t$, which is the times that $|\langle f_t,x\rangle - \langle f_t,x_t\rangle| > \delta$ till time $t$. Then,
 \begin{align*}
 0 
 &\leq D(x \|x_{T}) \\
-&\leq D(x \|x_1) - n_T \delta \log (1+\epsilon) \\
-&\leq \log N -   n_T \delta \log (1+\epsilon)
+&\leq D(x \|x_1) - n_T \frac{\delta \epsilon}{2} \\
+&\leq \log N -   n_T \frac{\delta \epsilon}{2}
 \end{align*}
 Therefore,
 $$
-n_T \leq \frac{\log N}{\delta \log(1+\epsilon)} \leq \frac{2 \log N}{\epsilon \delta}
+n_T \leq \frac{2 \log N}{\epsilon \delta}
 $$
-Given the fact that $0 < \epsilon < \delta < 1$ and $\log(1 + \epsilon) \geq \frac{\epsilon}{2}$ when $\epsilon \in (0,1)$.
 \end{proof}
 
 
