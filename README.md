@@ -1,4 +1,4 @@
-# Statistical Learning Theory
+# Machine Learning
 
 This repository covers the materials in Machine Learning course, Institute for Interdisciplinary Information Sciences(IIIS), Tsinghua University. 
 
