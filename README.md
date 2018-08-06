@@ -2,7 +2,7 @@
 
 This repository covers the materials in Machine Learning course, Institute for Interdisciplinary Information Sciences(IIIS), Tsinghua University. 
 
-The course is directed by Prof. Liwei Wang from Peking University, most parts of statistical learning theroy are covered. 
+The course is directed by [Prof. Liwei Wang](http://www.cis.pku.edu.cn/faculty/vision/wangliwei/) from Peking University, most parts of statistical learning theroy are covered. 
 
 Three parts are included:
 
